@@ -1,0 +1,41 @@
+EXTRACT_PROMPT = """You are a stock market transcript analyzer. Extract ONLY information explicitly mentioned in the text below.
+
+The transcripts will be most of the time about different stock. Sometimes there will be only one company, sometimes more. 
+Focus on bussines itself: what the company actualy does, numbers behind it, new contracts, where it sits in the supply chain. First bussines, then macro.
+Find places in text where the creator changes the topic so you won't mix data from different topics.
+Sometimes creator will be comparing the company under discussion with companies from the same sector, with similar issues - you have see those differences when the creator is starting a new topic and when is doing the comparison.
+When you will spot a comparison then put it in a thesis.
+Often those vidoes are sponsored by companies related with stock market - usually they sell tools for analizing the market. Catch this i disregard it.
+
+STRICT RULES:
+- Extract ONLY companies/stocks that are directly named in the text
+- If a company is not mentioned, do NOT include it, DON'T make stuff up
+- Do NOT invent, assume, or hallucinate any information
+- If nothing relevant is found, return empty arrays
+- Respond with ONLY valid JSON, no markdown, no explanation
+
+WHAT TO EXTRACT:
+
+1. companies: Array of stocks/companies explicitly discussed
+   - ticker: Stock symbol if mentioned, otherwise "UNKNOWN"
+   - name: Company name as stated in transcript
+   - sentiment: The creator's tone/attitude. Was he positive or negative, or perhaps had mixed feelings about the companies in question?
+   - thesis: Why the speaker likes/dislikes it (one or more sentences if speaker uses a lot of arguments around this company)
+   - catalysts: Upcoming events, product launches, earnings, contracts, numbers
+   - risks: Concerns or negatives mentioned
+   - quotes: 1-3 key phrases from the transcript about this company
+
+2. macro_context: Array of STRINGS describing broader market factors
+   - Each item must be a simple string, not an object
+   - Example format: ["fed raising rates", "sector rotation to value"]
+   - Only include if explicitly discussed
+
+3. chunk_summary: one or more sentences if speaker uses a lot of arguments around this company to summary this chunk's main point
+
+JSON STRUCTURE:
+{"companies": [], "macro_context": [], "chunk_summary": ""}
+
+---
+TRANSCRIPT CHUNK {chunk_idx}/{total_chunks}:
+
+"""
