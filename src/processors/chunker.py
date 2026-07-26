@@ -1,22 +1,9 @@
 import os
-import json
-from ollama import Client
-import ollama
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env file (looks for .env in the project root by default)
 load_dotenv()
-client = Client(host="http://192.168.0.164:11434")
 
-models = {"llama": "llama3.2:3b", "qwen": "qwen3.5:9b"}
-files = {
-    "sample": "docs/sample.txt",
-    "company_report": "docs/company_report.txt",
-    "10q": "docs/sample_10q.md",
-}
-
-# files_to_process_path = "./file_to_process/"
 files_to_process_path = os.getenv("FILE_TO_PROCESS_PATH")
 
 # List only files in the top-level directory
@@ -38,7 +25,7 @@ def read_document(file_path: str) -> str:
     return content
 
 
-def chunk_by_chars(text: str, chunk_size: int = 500, overlap: int = 50) -> list[dict]:
+def chunk_by_chars(text: str, chunk_size: int = 1000, overlap: int = 150) -> list[dict]:
     chunks = []
     start = 0
     chunk_id = 0
@@ -62,56 +49,74 @@ def chunk_by_chars(text: str, chunk_size: int = 500, overlap: int = 50) -> list[
     return chunks
 
 
-def chunk_by_sentences(text: str, max_chunk_size: int = 500) -> list[dict]:
-    import re
+import re
+from typing import List, Dict
 
-    sentences = re.split(r"(?<=[.!?])\s+", text)
+
+def chunk_by_sentences(
+    text: str, max_chunk_size: int = 1000, overlap_sentences: int = 2
+) -> List[Dict]:
+    """
+    Chunk text by sentences with configurable overlap.
+    """
+
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    sentences = [s.strip() for s in sentences if s.strip()]
 
     chunks = []
-    current_chunk = ""
     chunk_id = 0
 
-    for sentence in sentences:
-        # If adding this sentence exceeds limit, save current chunk
-        if len(current_chunk) + len(sentence) > max_chunk_size:
-            chunks.append(
-                {
-                    "id": chunk_id,
-                    "text": current_chunk.strip(),
-                    "metadata": {
-                        "char_count": len(current_chunk.strip()),
-                        "document_type": "announcment",
-                        "section": "Risk Factors",
-                        "filing_date": "2025-02-26",
-                    },
-                }
-            )
-            chunk_id += 1
-            current_chunk = ""
+    i = 0
+    while i < len(sentences):
+        current_chunk = []
+        current_length = 0
 
-        current_chunk += sentence + " "
+        # Build current chunk
+        j = i
+        while j < len(sentences):
+            sentence = sentences[j]
+            new_length = current_length + len(sentence) + 1  # +1 for space
 
-    # Don't forget the last chunk!
-    if current_chunk.strip():
+            if (
+                new_length > max_chunk_size and current_chunk
+            ):  # Don't create empty chunk
+                break
+
+            current_chunk.append(sentence)
+            current_length = new_length
+            j += 1
+
+        # Create chunk
+        chunk_text = " ".join(current_chunk)
+
         chunks.append(
             {
                 "id": chunk_id,
-                "text": current_chunk.strip(),
+                "text": chunk_text,
                 "metadata": {
-                    "char_count": len(current_chunk.strip()),
-                    "document_type": "announcment",
+                    "char_count": len(chunk_text),
+                    "sentence_count": len(current_chunk),
+                    "start_sentence_idx": i,
+                    "end_sentence_idx": j - 1,
+                    "document_type": "announcement",
+                    "section": "Risk Factors",  # ← change dynamically if needed
                     "published_date": "2025-02-26",
                 },
             }
         )
 
-    """
-    with open("chunks.json", "w", encoding="utf-8") as file:
-        json.dump(chunks, file, ensure_ascii=False, indent=2)
-    """
-    return chunks
+        chunk_id += 1
+
+        # Move forward with overlap
+        if overlap_sentences > 0:
+            i += max(1, len(current_chunk) - overlap_sentences)
+        else:
+            i = j  # No overlap
+
+    return chunks[:-1]
 
 
+# TODO: delete
 def main():
     file_path = f"{files_to_process_path}/{files_to_process[0]}"
     print(file_path)
