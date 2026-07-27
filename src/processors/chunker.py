@@ -1,17 +1,23 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import re
+from typing import List, Dict
 
 load_dotenv()
 
-files_to_process_path = os.getenv("FILE_TO_PROCESS_PATH")
 
-# List only files in the top-level directory
-files_to_process = [
-    f
-    for f in os.listdir(files_to_process_path)
-    if os.path.isfile(os.path.join(files_to_process_path, f))
-]
+def get_file_path():
+    files_to_process_path = os.getenv("FILE_TO_PROCESS_PATH")
+
+    # List only files in the top-level directory
+    files_to_process = [
+        f
+        for f in os.listdir(files_to_process_path)
+        if os.path.isfile(os.path.join(files_to_process_path, f))
+    ]
+
+    return f"{files_to_process_path}/{files_to_process[0]}"
 
 
 def read_document(file_path: str) -> str:
@@ -23,34 +29,6 @@ def read_document(file_path: str) -> str:
         content = f.read()
 
     return content
-
-
-def chunk_by_chars(text: str, chunk_size: int = 1000, overlap: int = 150) -> list[dict]:
-    chunks = []
-    start = 0
-    chunk_id = 0
-
-    while start < len(text):
-        end = start + chunk_size
-        chunk = text[start:end]
-
-        chunks.append(
-            {
-                "id": chunk_id,
-                "chunk": chunk,
-                "start": start,
-                "end": min(end, len(text)),
-                "chunk_size": len(chunk),
-            }
-        )
-        start = end - overlap
-        chunk_id += 1
-
-    return chunks
-
-
-import re
-from typing import List, Dict
 
 
 def chunk_by_sentences(
@@ -116,19 +94,11 @@ def chunk_by_sentences(
     return chunks[:-1]
 
 
-# TODO: delete
-def main():
-    file_path = f"{files_to_process_path}/{files_to_process[0]}"
-    print(file_path)
+# TODO: don't like this logic, probably have to refactor(?)
+def get_sentence_chunks(max_chunk_size: int):
+    file_path = get_file_path()
+    raw_text = read_document(file_path)
+    max_chunk_size = max_chunk_size
+    sent_chunks = chunk_by_sentences(raw_text, max_chunk_size=3000)
 
-    text = read_document(file_path)
-    char_chunks = chunk_by_chars(text)
-    sent_chunks = chunk_by_sentences(text)
-
-    for sent in sent_chunks:
-        __import__("pprint").pprint(sent)
-        print("=" * 40)
-
-
-if __name__ == "__main__":
-    main()
+    return sent_chunks

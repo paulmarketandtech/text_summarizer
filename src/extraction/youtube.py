@@ -49,6 +49,9 @@ def extract_youtube_id(url):
 
 
 def create_video_transcript(url):
+    """Creates transcript of a given YT video and saves it as .txt
+    Returns metadata from YT"""
+
     video_id = extract_youtube_id(url)
     ytt_api = YouTubeTranscriptApi()
     meta_data = get_video_info(url)
