@@ -16,7 +16,7 @@ vectorize chunks (still in memory) and save to DB with all metadata for future R
 
 
 def main():
-    url = "https://youtu.be/4Ry3Jv_U8I8?si=nPgW29eq949ZEL9f"
+    url = "https://youtu.be/GvHpUvC1FpE?si=Dkdcwc1px5cdpaOS"
     # yt_metadata = youtube.create_video_transcript(url)
 
     sent_chunks = chunker.get_sentence_chunks(3000)

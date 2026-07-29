@@ -75,7 +75,3 @@ def create_video_transcript(url):
         text_file.write(output_text)
 
     return meta_data
-
-
-if __name__ == "__main__":
-    pass
