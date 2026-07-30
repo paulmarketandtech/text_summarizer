@@ -1,8 +1,8 @@
-from pathlib import Path
 import json
 import time
-import yaml
+from pathlib import Path
 
+import yaml
 from ollama import Client
 
 client = Client(host="http://192.168.0.164:11434")
@@ -19,8 +19,8 @@ def load_prompt(name: str) -> str:
 
 MODEL_EXTRACT = models["qwen2"]
 MODEL_FINAL = models["qwen2"]
-EXTRACT_PROMPT = load_prompt("extract.json")
-FINAL_PROMPT = load_prompt("final_synthesis.txt")
+# EXTRACT_PROMPT = load_prompt("extract.json")
+# FINAL_PROMPT = load_prompt("final_synthesis.txt")
 
 
 class Timer:

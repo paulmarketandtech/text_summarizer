@@ -1,76 +1,24 @@
-from pathlib import Path
 import json
 import time
-import yaml
 from collections import defaultdict
-from src.core import llm_client
+from pathlib import Path
 
+import yaml
+
+from src.core import llm_client
 
 with open("../../config/prompts.yaml", "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
 
 
-SYSTEM_PROMPT = """You are a precise financial data extraction bot.
-        Extract stock/company data from transcript text.
-        Return ONLY a valid JSON array of objects. Do not summarize general macro statements unless directly tied to a specific stock.
-        If no specific company or stock is discussed, return an empty array []."""
+SYSTEM_PROMPT = """"""
 
 USER_PROMPT = """
-    Analyze the following transcript excerpt and extract details for EVERY specific stock/company mentioned.
-
-    Return ONLY a JSON array. If no stocks are mentioned, return [].
-
-    JSON Format required:
-    [
-    {{
-        "company_name": "TICKER or Company Name",
-        "kpis_mentioned": ["list of financial numbers, revenue growth, product sales, margins, etc."],
-        "investment_thesis_bull": ["bull arguments mentioned by creator"],
-        "investment_thesis_bear": ["bear arguments or risks mentioned by creator"],
-        "strengths": ["specific strengths mentioned"],
-        "weaknesses": ["specific weaknesses mentioned"],
-        "catalysts": ["upcoming events, earnings, product launches mentioned"]
-    }}
-    ]
-
-    Transcript Excerpt:
-    {chunk_text}
 """
 
-SYNTHESIS_SYSTEM_PROMPT = """You are a senior equity research analyst.
-Synthesize raw extracted notes into a clean, concise stock analysis report.
-Rely ONLY on the provided notes. Do not hallucinate external context."""
+SYNTHESIS_SYSTEM_PROMPT = """"""
 
-SYNTHESIS_USER_TEMPLATE = """Generate a clean analysis for {stock_name}. Deduplicate facts and present them cleanly.
-
-Raw Notes:
-- KPIs/Metrics: {kpis}
-- Bull Case: {bull_thesis}
-- Bear Case: {bear_thesis}
-- Strengths: {strengths}
-- Weaknesses: {weaknesses}
-- Catalysts: {catalysts}
-
-Format output as Markdown:
-
-### {stock_name}
-
-**KPIs & Financial Metrics:**
-- bullet points...
-
-**Investment Thesis:**
-- **Bull Case:** ...
-- **Bear Case:** ...
-
-**Specific Strengths:**
-- bullet points...
-
-**Specific Weaknesses:**
-- bullet points...
-
-**Key Catalysts:**
-- bullet points...
-"""
+SYNTHESIS_USER_TEMPLATE = """"""
 
 llm = llm_client.OllamaClient()
 
@@ -178,7 +126,7 @@ def loop_all_chunks(all_chunks: list[dict]):
     full_report = process_transcript(all_chunks)
 
     # Save output
-    with open("tsy_summary.md", "w", encoding="utf-8") as f:
+    with open("./outputs/tsy_summary.md", "w", encoding="utf-8") as f:
         f.write(full_report)
 
     print("\nDone! Saved to stock_summary.md")

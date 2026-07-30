@@ -24,11 +24,7 @@ class OllamaClient:
         For classification: use 0.1
         """
 
-        # Ollama doesn't support temperature in all versions
-        # But here's how you'd set it:
-
         import requests
-        import json
 
         payload = {
             "model": model,
@@ -48,5 +44,4 @@ class OllamaClient:
         response = requests.post(f"{self.host}/api/generate", json=payload)
         response.raise_for_status()
 
-        # return response.json()["response"]
         return response.json()["response"]
