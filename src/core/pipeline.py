@@ -1,5 +1,5 @@
 from src.processors import chunker, summarizer, vectorizer
-from src.extraction import youtube
+from src.extraction import youtube_transcript, transcript_data_extraction
 import numpy as np
 
 """
@@ -19,9 +19,10 @@ def main():
     url = "https://youtu.be/GvHpUvC1FpE?si=Dkdcwc1px5cdpaOS"
     # yt_metadata = youtube.create_video_transcript(url)
 
-    sent_chunks = chunker.get_sentence_chunks(3000)
+    sent_chunks = chunker.get_sentence_chunks(4000)
 
-    summarizer.final_summarization(sent_chunks)
+    transcript_data_extraction.loop_all_chunks(sent_chunks)
+    # summarizer.final_summarization(sent_chunks)
 
     # vectorizer.extract_text_from_chunk(sent_chunks)
 
