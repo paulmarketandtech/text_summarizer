@@ -73,8 +73,6 @@ Format output as Markdown:
 """
 
 llm = llm_client.OllamaClient()
-# sky = llm.generate(user_prompt="why the sky is blue?")
-# print(sky)
 
 
 def extract_facts_from_chunk(chunk: str) -> list[dict]:
