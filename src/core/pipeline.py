@@ -1,6 +1,5 @@
+from src.extraction import transcript_data_extraction, youtube_transcript
 from src.processors import chunker, summarizer, vectorizer
-from src.extraction import youtube_transcript, transcript_data_extraction
-import numpy as np
 
 """
 Workflow:
@@ -19,9 +18,9 @@ def main():
     url = "https://youtu.be/GvHpUvC1FpE?si=Dkdcwc1px5cdpaOS"
     # yt_metadata = youtube.create_video_transcript(url)
 
-    sent_chunks = chunker.get_sentence_chunks(4000)
+    file_name, sent_chunks = chunker.get_sentence_chunks(4000)
 
-    transcript_data_extraction.loop_all_chunks(sent_chunks)
+    transcript_data_extraction.loop_all_chunks(file_name, sent_chunks)
     # summarizer.final_summarization(sent_chunks)
 
     # vectorizer.extract_text_from_chunk(sent_chunks)

@@ -1,7 +1,5 @@
 import json
-import time
 from collections import defaultdict
-from pathlib import Path
 
 import yaml
 
@@ -11,22 +9,49 @@ with open("../../config/prompts.yaml", "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
 
 
-SYSTEM_PROMPT = """"""
-
-USER_PROMPT = """
-"""
-
-SYNTHESIS_SYSTEM_PROMPT = """"""
-
-SYNTHESIS_USER_TEMPLATE = """"""
-
 llm = llm_client.OllamaClient()
 
 
+def extract_metadata_from_chunk(
+    chunk: dict, idx: int, total_chunks: int, yt_metadata: dict
+):
+    prompt = (
+        EXTRACT_PROMPT.replace("{chunk_idx}", str(idx)).replace(
+            "{total_chunks}", str(total_chunks)
+        )
+        + chunk["text"]
+    )
+    response = client.chat(
+        model=MODEL_EXTRACT, messages=[{"role": "user", "content": prompt}]
+    )
+    metadata = {
+        "extract_prompt": response.message.content,
+        "yt_metadata": yt_metadata,
+        "chunk_index": idx,
+        "model": response.model,
+        "created_at": response.created_at,
+        "eval_count": response.eval_count,
+        "eval_duration": response.eval_duration,
+        "prompt_eval_count": response.prompt_eval_count,
+        "prompt_eval_duration": response.prompt_eval_duration,
+        "load_duration": response.load_duration,
+        "total_duration": response.total_duration,
+    }
+    with open("chunk_metadata.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps(metadata) + "\n")
+
+    # while data being saved to jsonl, there's no need of return anything.
+    return response
+
+
 def extract_facts_from_chunk(chunk: str) -> list[dict]:
-    prompt = USER_PROMPT.format(chunk_text=chunk)
+    config = prompts["extract_data_to_json"]
+    system_prompt = config["system"]
+    user_prompt = config["user"]
+
+    prompt = user_prompt.format(chunk_text=chunk)
     raw_response = llm.generate(
-        user_prompt=prompt, system_prompt=SYSTEM_PROMPT, json_mode=True
+        user_prompt=prompt, system_prompt=system_prompt, json_mode=True
     )
 
     try:
@@ -36,6 +61,8 @@ def extract_facts_from_chunk(chunk: str) -> list[dict]:
         elif isinstance(data, dict):
             # In case the model returns {"stocks": [...]} instead of direct list
             print("elif")
+            print(f"chunk: {chunk}")
+            print("*" * 40)
             print(data.get("stocks", [data]))
             print("=" * 40)
             return data.get("stocks", [data])
@@ -81,7 +108,11 @@ def aggregate_extracted_data(
 
 
 def generate_stock_report(stock_name: str, stock_data: dict) -> str:
-    prompt = SYNTHESIS_USER_TEMPLATE.format(
+    config = prompts["synthesis_json_data"]
+    synthesis_system_template = config["system"]
+    synthesis_user_template = config["user"]
+
+    prompt = synthesis_user_template.format(
         stock_name=stock_name,
         kpis=json.dumps(stock_data["kpis"]),
         bull_thesis=json.dumps(stock_data["bull_thesis"]),
@@ -92,7 +123,7 @@ def generate_stock_report(stock_name: str, stock_data: dict) -> str:
     )
 
     return llm.generate(
-        user_prompt=prompt, system_prompt=SYNTHESIS_SYSTEM_PROMPT, json_mode=False
+        user_prompt=prompt, system_prompt=synthesis_system_template, json_mode=False
     )
 
 
@@ -122,11 +153,13 @@ def process_transcript(all_chunks: list[dict]):
     return final_output
 
 
-def loop_all_chunks(all_chunks: list[dict]):
+def loop_all_chunks(file_name: str, all_chunks: list[dict]):
     full_report = process_transcript(all_chunks)
 
-    # Save output
-    with open("./outputs/tsy_summary.md", "w", encoding="utf-8") as f:
+    splitted_file_name = file_name.split("_")
+    # change the _tanscript word to _summarized
+    output_file_name = "_".join(splitted_file_name[:5]) + "_summarized.md"
+    with open(f"./outputs/{output_file_name}", "w", encoding="utf-8") as f:
         f.write(full_report)
 
-    print("\nDone! Saved to stock_summary.md")
+    print(f"\nDone! Saved to {output_file_name}")

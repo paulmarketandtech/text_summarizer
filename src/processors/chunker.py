@@ -1,8 +1,9 @@
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 import re
-from typing import List, Dict
+from pathlib import Path
+from typing import Dict, List
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -20,15 +21,16 @@ def get_file_path():
     return f"{files_to_process_path}/{files_to_process[0]}"
 
 
-def read_document(file_path: str) -> str:
+def read_document(file_path: str) -> tuple[str, str]:
     path = Path(file_path)
+    file_name = path.name
     if not path.exists():
         raise FileNotFoundError(f"File not found: {file_path}")
 
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    return content
+    return file_name, content
 
 
 def chunk_by_sentences(
@@ -97,8 +99,7 @@ def chunk_by_sentences(
 # TODO: don't like this logic, probably have to refactor(?)
 def get_sentence_chunks(max_chunk_size: int):
     file_path = get_file_path()
-    raw_text = read_document(file_path)
-    max_chunk_size = max_chunk_size
-    sent_chunks = chunk_by_sentences(raw_text, max_chunk_size=3000)
+    file_name, raw_text = read_document(file_path)
+    sent_chunks = chunk_by_sentences(raw_text, max_chunk_size)
 
-    return sent_chunks
+    return file_name, sent_chunks
