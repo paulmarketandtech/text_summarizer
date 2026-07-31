@@ -1,10 +1,5 @@
-import requests
-from pathlib import Path
-import os
-
-import json
 import numpy as np
-
+import requests
 
 EMBEDDING_MODEL = "nomic-embed-text"
 OLLAMA_URL = "http://192.168.0.164:11434"
@@ -30,7 +25,7 @@ def normalize_rows(matrix: np.ndarray) -> np.ndarray:
     return matrix / np.clip(lengths, 1e-12, None)
 
 
-def extract_text_from_chunk(sent_chunks):
+def vectorize_text(sent_chunks):
     chunks = [chunk["text"] for chunk in sent_chunks]
     vectors = embed_texts(chunks)
     document_vectors = normalize_rows(vectors)
