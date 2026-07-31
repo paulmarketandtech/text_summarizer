@@ -100,6 +100,7 @@ def chunk_by_sentences(
 def get_sentence_chunks(max_chunk_size: int):
     file_path = get_file_path()
     file_name, raw_text = read_document(file_path)
+    print(file_name)
     sent_chunks = chunk_by_sentences(raw_text, max_chunk_size)
 
     return file_name, sent_chunks

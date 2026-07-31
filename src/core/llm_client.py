@@ -44,4 +44,4 @@ class OllamaClient:
         response = requests.post(f"{self.host}/api/generate", json=payload)
         response.raise_for_status()
 
-        return response.json()["response"]
+        return response.json()
