@@ -1,14 +1,12 @@
 from pathlib import Path
 
 import yaml
-from ollama import Client  # pyright: ignore
 
-client = Client(host="http://192.168.0.164:11434")
 models = {"llama": "llama3.2:3b", "qwen3": "qwen3.5:9b", "qwen2": "qwen2.5:7b"}
 
 
 class PromptManager:
-    def __init__(self, prompts_file: str = "./prompts.yaml"):
+    def __init__(self, prompts_file: str):
         self.prompts_file = Path(prompts_file)
         self.prompts = self._load_prompts()
         self.cache = {}
@@ -31,7 +29,7 @@ class PromptManager:
         return {"system": system_prompt, "task": task_prompt}
 
 
-manager = PromptManager("./prompts.yaml")
+# manager = PromptManager()
 
 # You can easily swap 'executive_brief' to 'dense_synthesis' to experiment
-prompt = manager.get_prompt(category="stock_analysis", transcript=chunk_text)
+# prompt = manager.get_prompt(category="stock_analysis", transcript=chunk_text)
