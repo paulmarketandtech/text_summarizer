@@ -1,3 +1,9 @@
+"""
+Thing to vectorize:
+each original chunk
+whole summarized text
+"""
+
 import numpy as np
 import requests
 
@@ -25,8 +31,7 @@ def normalize_rows(matrix: np.ndarray) -> np.ndarray:
     return matrix / np.clip(lengths, 1e-12, None)
 
 
-def vectorize_text(sent_chunks):
-    chunks = [chunk["text"] for chunk in sent_chunks]
-    vectors = embed_texts(chunks)
+def vectorize_text(text: list[str]):
+    vectors = embed_texts(text)
     document_vectors = normalize_rows(vectors)
     np.save("../../data/vectorized/tsy.npy", document_vectors)

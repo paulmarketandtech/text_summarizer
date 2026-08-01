@@ -1,5 +1,5 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
-from src.processors import chunker, summarizer, vectorizer
+from src.processors import chunker, vectorizer
 
 """
 Workflow:
@@ -20,8 +20,7 @@ def main():
 
     file_name, sent_chunks = chunker.get_sentence_chunks(4000)
 
-    # transcript_data_extraction.loop_all_chunks(file_name, sent_chunks, yt_metadata)
-    # summarizer.final_summarization(sent_chunks)
+    # transcript_data_extraction.report_generator(file_name, sent_chunks)
 
     # vectorizer.vectorize_text(sent_chunks)
 

@@ -4,6 +4,7 @@ from collections import defaultdict
 import yaml
 
 from src.core import llm_client
+from src.processors import vectorizer
 
 with open("../../config/prompts.yaml", "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
@@ -41,7 +42,9 @@ def extract_metadata_from_chunk(
     # return metadata
 
 
-def extract_facts_from_chunk(chunk: str, idx, total_chunks, yt_metadata) -> list[dict]:
+def extract_facts_from_chunk(
+    chunk: str, idx: int, number_total_chunks: int, yt_metadata
+) -> list[dict]:
     config = prompts["extract_data_to_json"]
     system_prompt = config["system"]
     user_prompt = config["user"]
@@ -52,9 +55,10 @@ def extract_facts_from_chunk(chunk: str, idx, total_chunks, yt_metadata) -> list
         user_prompt=prompt, system_prompt=system_prompt, json_mode=True
     )
     extract_metadata_from_chunk(
-        metadata_promts, response, idx, total_chunks, yt_metadata
+        metadata_promts, response, idx, number_total_chunks, yt_metadata
     )
 
+    # TODO: over here embed chunk and llm metadata
     raw_response = response["response"]
     try:
         data = json.loads(raw_response)
@@ -165,8 +169,11 @@ def process_transcript(all_chunks: list[dict], yt_metadata):
     return final_output
 
 
-def loop_all_chunks(file_name: str, all_chunks: list[dict], yt_metadata=None):
+def report_generator(file_name: str, all_chunks: list[dict], yt_metadata=None):
+    if yt_metadata is None:
+        yt_metadata = {}
     full_report = process_transcript(all_chunks, yt_metadata)
+    # TODO: embed full report over here?
 
     splitted_file_name = file_name.split("_")
     # change the _tanscript word to _summarized
