@@ -23,7 +23,7 @@ def main():
     # transcript_data_extraction.loop_all_chunks(file_name, sent_chunks, yt_metadata)
     # summarizer.final_summarization(sent_chunks)
 
-    vectorizer.vectorize_text(sent_chunks)
+    # vectorizer.vectorize_text(sent_chunks)
 
 
 if __name__ == "__main__":

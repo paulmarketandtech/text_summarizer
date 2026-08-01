@@ -1,6 +1,10 @@
-import requests
 import numpy as np
+import requests
 
+from src.processors import chunker
+
+file_name, sent_chunks = chunker.get_sentence_chunks(4000)
+chunks = [chunk["text"] for chunk in sent_chunks]
 
 OLLAMA_URL = "http://192.168.0.164:11434"
 EMBEDDING_MODEL = "nomic-embed-text"
@@ -21,7 +25,7 @@ def embed_texts(texts: list[str]) -> np.ndarray:
     return np.asarray(payload["embeddings"], dtype=np.float32)
 
 
-document_vectors = np.load("../../data/vectorized/shay.npy")
+document_vectors = np.load("../../data/vectorized/tsy.npy")
 
 
 def embed_query(query: str) -> np.ndarray:
@@ -49,12 +53,19 @@ def search_embeddings(query: str, top_k: int = 3):
         results.append(
             {
                 "score": float(scores[index]),
+                "chunk": chunks[index],
             }
         )
 
     return results
 
 
-results = search_embeddings("what are the biggest opportunities?")
-for r in results:
-    print(r)
+def main():
+
+    results = search_embeddings("this stock has huge growth potencial")
+    for r in results:
+        print(r)
+
+
+if __name__ == "__main__":
+    main()

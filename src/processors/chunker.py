@@ -5,7 +5,40 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
+from config import prompt_manager
+from src.core import llm_client
+
+llm = llm_client.OllamaClient()
+
 load_dotenv()
+manager_prompt = prompt_manager.PromptManager("../../config/prompts.yaml")
+
+
+def cleaning_text_from_stutters(all_chunks: list[dict]):
+    """
+    Cleans the transcript from stutters like: 'um', 'yeah', 'you know' etc
+    """
+    config = manager_prompt.prompts["preprocessing"]["clean_transcript"]
+    system_prompt = config["system"]
+    user_prompt = config["task"]
+
+    for index, chunk in enumerate(all_chunks):
+        print(f"--- Processing Chunk {index} ---")
+
+        # -------------------------------------------------------------
+        # STEP 1: CLEAN THE CHUNK
+        # -------------------------------------------------------------
+
+        prompt = user_prompt.format(raw_text=chunk["text"])
+        clean_response = llm.generate(
+            user_prompt=prompt,
+            system_prompt=system_prompt,
+            temperature=0.1,
+            json_mode=True,
+        )
+        # cleaned_text = clean_response["message"]["content"].strip()
+        cleaned_text = clean_response["response"].strip()
+        print(f"Cleaned: {cleaned_text}")
 
 
 def get_file_path():
@@ -102,5 +135,5 @@ def get_sentence_chunks(max_chunk_size: int):
     file_name, raw_text = read_document(file_path)
     print(file_name)
     sent_chunks = chunk_by_sentences(raw_text, max_chunk_size)
-
+    cleaning_text_from_stutters(sent_chunks)
     return file_name, sent_chunks

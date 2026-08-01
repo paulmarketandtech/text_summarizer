@@ -165,7 +165,7 @@ def process_transcript(all_chunks: list[dict], yt_metadata):
     return final_output
 
 
-def loop_all_chunks(file_name: str, all_chunks: list[dict], yt_metadata={}):
+def loop_all_chunks(file_name: str, all_chunks: list[dict], yt_metadata=None):
     full_report = process_transcript(all_chunks, yt_metadata)
 
     splitted_file_name = file_name.split("_")
