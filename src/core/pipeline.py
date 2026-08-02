@@ -1,5 +1,6 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
 from src.processors import chunker, vectorizer
+from src.storage import database
 
 """
 Workflow:
@@ -26,4 +27,5 @@ def main():
 
 
 if __name__ == "__main__":
+    database.init_db()
     main()
