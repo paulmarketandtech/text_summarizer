@@ -5,7 +5,27 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
+from src.storage.database import get_session
+from src.storage.models import TranscriptChunk
+
 load_dotenv()
+
+
+def chunk_db_population(chunk_idx: int, chunk_text: str):
+
+    char_count = len(chunk_text)
+    word_count = len(chunk_text.split())
+    with get_session() as session:
+        new_chunk = TranscriptChunk(
+            url="text_url",
+            chunk_index=chunk_idx,
+            chunk_text=chunk_text,
+            char_count=char_count,
+            word_count=word_count,
+        )
+        session.add(new_chunk)
+        session.commit()
+        print("commited?")
 
 
 def clean_transcript(text: str) -> str:
@@ -150,6 +170,8 @@ def chunk_by_sentences(
         # Create chunk
         chunk_text = " ".join(current_chunk)
 
+        chunk_db_population(chunk_id, chunk_text)
+
         chunks.append(
             {
                 "id": chunk_id,
@@ -185,4 +207,9 @@ def get_sentence_chunks(max_chunk_size: int):
     cleaned_text = clean_transcript(raw_text)
     sent_chunks = chunk_by_sentences(cleaned_text, max_chunk_size)
 
+    """
+    chunks = [chunk['text'] for chunk in sent_chunks]
+    with open(f"./chunk_outputs/chunks_{file_name}") as file:
+        file.write()
+    """
     return file_name, sent_chunks
