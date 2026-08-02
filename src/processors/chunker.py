@@ -8,23 +8,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def chunk_db_population(chunk_idx: int, chunk_text: str):
-
-    char_count = len(chunk_text)
-    word_count = len(chunk_text.split())
-    with get_session() as session:
-        new_chunk = TranscriptChunk(
-            url="text_url",
-            chunk_index=chunk_idx,
-            chunk_text=chunk_text,
-            char_count=char_count,
-            word_count=word_count,
-        )
-        session.add(new_chunk)
-        session.commit()
-        print("commited?")
-
-
 def clean_transcript(text: str) -> str:
     # 1. Collapse multiple spaces/newlines into a single space
     text = re.sub(r"\s+", " ", text).strip()
@@ -167,20 +150,17 @@ def chunk_by_sentences(
         # Create chunk
         chunk_text = " ".join(current_chunk)
 
-        chunk_db_population(chunk_id, chunk_text)
-
         chunks.append(
             {
                 "id": chunk_id,
                 "text": chunk_text,
                 "metadata": {
                     "char_count": len(chunk_text),
+                    "word_count": len(chunk_text.split()),
                     "sentence_count": len(current_chunk),
                     "start_sentence_idx": i,
                     "end_sentence_idx": j - 1,
                     "document_type": "announcement",
-                    "section": "Risk Factors",  # ← change dynamically if needed
-                    "published_date": "2025-02-26",
                 },
             }
         )

@@ -3,12 +3,12 @@ import re
 
 import yt_dlp  # pyright: ignore
 from dotenv import load_dotenv
+
+load_dotenv()
 from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 from src.storage.database import get_session
 from src.storage.models import Video
-
-load_dotenv()
 
 
 def yt_db_population(yt_meta_data: dict):
@@ -84,7 +84,7 @@ def create_video_transcript(url) -> None:
     )
     channel_name_clean = re.sub(r"[^a-zA-Z0-9\\s]", "", channel_name_capitalized)
 
-    filename = f"yt_{yt_meta_data['published']}_{channel_name_clean}_{video_id}"
+    filename = f"yt_{yt_meta_data['published_date']}_{channel_name_clean}_{video_id}"
 
     with open(
         f"{os.getenv('FILE_TO_PROCESS_PATH')}/{filename}_transcript.txt", "w"
