@@ -22,6 +22,8 @@ class Video(Base):
 
     # Basic metadata
     title = Column(String(500))
+    yt_creator = Column(String(500))
+    published_date = Column(String(100))
     content_type = Column(
         String(100), index=True
     )  # stock_analysis, drama queen, macro, etc.
@@ -47,10 +49,8 @@ class Video(Base):
 
     def to_dict(self):
         return {
-            "video_id": self.video_id,
             "title": self.title,
             "url": self.url,
-            "source_type": self.source_type,
             "content_type": self.content_type,
             "created_at": self.created_at.isoformat(),
         }

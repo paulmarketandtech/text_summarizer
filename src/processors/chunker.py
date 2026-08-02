@@ -5,9 +5,6 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
-from src.storage.database import get_session
-from src.storage.models import TranscriptChunk
-
 load_dotenv()
 
 

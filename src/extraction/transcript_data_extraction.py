@@ -18,11 +18,9 @@ def extract_metadata_from_chunk(
     response,
     idx: int = 0,
     total_chunks: int = 0,
-    yt_metadata: dict = {},
 ):
 
-    metadata = {
-        "yt_metadata": yt_metadata,
+    llm_metadata = {
         "chunk_index": idx,
         "total_chunks": total_chunks,
         "metadata_promts": metadata_promts,
@@ -35,15 +33,15 @@ def extract_metadata_from_chunk(
         "load_duration": response["load_duration"],
         "total_duration": response["total_duration"],
     }
-    with open("chunk_metadata.jsonl", "a", encoding="utf-8") as f:
-        f.write(json.dumps(metadata) + "\n")
+    # with open("chunk_metadata.jsonl", "a", encoding="utf-8") as f:
+    #    f.write(json.dumps(llm_metadata) + "\n")
 
     # while data being saved to jsonl, there's no need of return anything.
-    # return metadata
+    return llm_metadata
 
 
 def extract_facts_from_chunk(
-    chunk: str, idx: int, number_total_chunks: int, yt_metadata
+    chunk: str, idx: int, number_total_chunks: int
 ) -> list[dict]:
     config = prompts["extract_data_to_json"]
     system_prompt = config["system"]
@@ -54,8 +52,8 @@ def extract_facts_from_chunk(
     response = llm.generate(
         user_prompt=prompt, system_prompt=system_prompt, json_mode=True
     )
-    extract_metadata_from_chunk(
-        metadata_promts, response, idx, number_total_chunks, yt_metadata
+    llm_metadata = extract_metadata_from_chunk(
+        metadata_promts, response, idx, number_total_chunks
     )
 
     # TODO: over here embed chunk and llm metadata
@@ -136,21 +134,19 @@ def generate_stock_report(stock_name: str, stock_data: dict) -> str:
     response = llm.generate(
         user_prompt=prompt, system_prompt=synthesis_system_template, json_mode=False
     )
-    extract_metadata_from_chunk(metadata_promts, response)
+    # extract_metadata_from_chunk(metadata_promts, response)
 
     return response
 
 
-def process_transcript(all_chunks: list[dict], yt_metadata):
+def process_transcript(all_chunks: list[dict]):
     print(f"Total Chunks: {len(all_chunks)}")
 
     print("\n2. Extracting structured data from chunks...")
     all_extractions = []
     for idx, chunk in enumerate(all_chunks):
         print(f"Processing chunk {idx + 1}/{len(all_chunks)}...")
-        facts = extract_facts_from_chunk(
-            chunk["text"], idx, len(all_chunks), yt_metadata
-        )
+        facts = extract_facts_from_chunk(chunk["text"], idx, len(all_chunks))
         all_extractions.append(facts)
 
     print("\n3. Aggregating facts per company...")
@@ -169,10 +165,8 @@ def process_transcript(all_chunks: list[dict], yt_metadata):
     return final_output
 
 
-def report_generator(file_name: str, all_chunks: list[dict], yt_metadata=None):
-    if yt_metadata is None:
-        yt_metadata = {}
-    full_report = process_transcript(all_chunks, yt_metadata)
+def report_generator(file_name: str, all_chunks: list[dict]):
+    full_report = process_transcript(all_chunks)
     # TODO: embed full report over here?
 
     splitted_file_name = file_name.split("_")
