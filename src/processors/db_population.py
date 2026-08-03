@@ -28,9 +28,15 @@ def yt_db_population(yt_meta_data: dict, transcript_text: str):
         session.commit()
 
 
-def db_population_manager(yt_metadata, sent_chunks, output_report_path, full_report):
-    transcript_char_length = len(yt_metadata["transcript_text"])
-    transcript_word_count = len(yt_metadata["transcript_text"].split())
+def db_population_manager(
+    yt_metadata: dict,
+    sent_chunks: list[dict],
+    llm_chunks_metadata: list[dict],
+    llm_report_metadata: dict,
+):
+    transcript_char_length = len(yt_metadata.get("transcript_text"))
+    transcript_word_count = len(yt_metadata.get("transcript_text").split())
+    full_report = llm_report_metadata.get("full_report")
 
     with get_session() as session:
         video = session.query(Video).filter_by(url=yt_metadata["url"]).one_or_none()
@@ -39,11 +45,11 @@ def db_population_manager(yt_metadata, sent_chunks, output_report_path, full_rep
             video = Video(
                 id=uuid.uuid4(),
                 url=yt_metadata["url"],
-                title=yt_metadata["title"],
-                yt_creator=yt_metadata["uploader_id"],
-                published_date=yt_metadata["published_date"],
-                transcript_file_path=yt_metadata["transcript_path"],
-                summary_file_path=output_report_path,
+                title=yt_metadata.get("title"),
+                yt_creator=yt_metadata.get("uploader_id"),
+                published_date=yt_metadata.get("published_date"),
+                transcript_file_path=yt_metadata.get("transcript_path"),
+                summary_file_path=llm_report_metadata.get("output_report_path"),
                 summary_preview=full_report[:490],  # max char is 500, just to be sure
                 transcript_char_length=transcript_char_length,
                 transcript_word_count=transcript_word_count,
@@ -51,14 +57,17 @@ def db_population_manager(yt_metadata, sent_chunks, output_report_path, full_rep
             session.add(video)
 
         for chunk in sent_chunks:
+            metadata = chunk.get("metadata") or {}
+            # example for single nested extraction
+            # char_count = chunk.get("metadata", {}).get("char_count")
             video.chunks.append(
                 TranscriptChunk(
                     # video_id=video.id,  # ← UUID reference
                     chunk_index=chunk["id"],
                     chunk_text=chunk["text"],
-                    char_count=chunk["metadata"]["char_count"],
-                    word_count=chunk["metadata"]["word_count"],
-                    sentence_count=chunk["metadata"]["sentence_count"],
+                    char_count=metadata.get("char_count"),
+                    word_count=metadata.get("word_count"),
+                    sentence_count=metadata.get("sentence_count"),
                 )
             )
 

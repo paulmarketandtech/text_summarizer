@@ -21,12 +21,12 @@ def main():
 
     file_name, sent_chunks = chunker.get_sentence_chunks(4000)
 
-    output_report_path, full_report = transcript_data_extraction.report_generator(
-        file_name, sent_chunks
+    llm_chunks_metadata, llm_report_metadata = (
+        transcript_data_extraction.report_generator(file_name, sent_chunks)
     )
 
     db_population.db_population_manager(
-        yt_metadata, sent_chunks, output_report_path, full_report
+        yt_metadata, sent_chunks, llm_chunks_metadata, llm_report_metadata
     )
 
     # vectorizer.vectorize_text(sent_chunks)
