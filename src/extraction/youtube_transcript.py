@@ -1,26 +1,23 @@
 import os
 import re
 
-import yt_dlp
+import yt_dlp  # pyright: ignore
 from dotenv import load_dotenv
-from pathlib import Path
-from datetime import datetime
-
-# from pipeline import summarizing_transcript
-from youtube_transcript_api import YouTubeTranscriptApi
 
 load_dotenv()
+from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 
 def get_video_info(url):
     ydl_opts = {"quiet": True, "no_warnings": True}
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore
         info = ydl.extract_info(url, download=False)
         return {
             "title": info.get("title"),
             "uploader_id": info.get("uploader_id"),
-            "published": info.get("upload_date"),  # YYYYMMDD format
+            "published_date": info.get("upload_date"),  # YYYYMMDD format
+            "url": url,
         }
 
 
@@ -48,30 +45,32 @@ def extract_youtube_id(url):
     return None
 
 
-def create_video_transcript(url):
+def create_video_transcript(url) -> dict:
     """Creates transcript of a given YT video and saves it as .txt
     Returns metadata from YT"""
 
     video_id = extract_youtube_id(url)
     ytt_api = YouTubeTranscriptApi()
-    meta_data = get_video_info(url)
+    yt_meta_data = get_video_info(url)
     fetched_transcript = ytt_api.fetch(video_id, languages=["en", "pl", "de"])
-    output_text = ""
+    transcript_text = ""
 
     for snippet in fetched_transcript:
-        output_text += snippet.text
-        output_text += " "
+        transcript_text += snippet.text
+        transcript_text += " "
 
     channel_name_capitalized = "".join(
-        word.capitalize() for word in meta_data["uploader_id"].split()
+        word.capitalize() for word in yt_meta_data["uploader_id"].split()
     )
     channel_name_clean = re.sub(r"[^a-zA-Z0-9\\s]", "", channel_name_capitalized)
 
-    filename = f"yt_{meta_data['published']}_{channel_name_clean}_{video_id}"
+    filename = f"yt_{yt_meta_data['published_date']}_{channel_name_clean}_{video_id}"
+    transcript_path = f"{os.getenv('FILE_TO_PROCESS_PATH')}/{filename}_transcript.txt"
 
-    with open(
-        f"{os.getenv('FILE_TO_PROCESS_PATH')}/{filename}_transcript.txt", "w"
-    ) as text_file:
-        text_file.write(output_text)
+    yt_meta_data["transcript_path"] = transcript_path
+    yt_meta_data["transcript_text"] = transcript_text
 
-    return meta_data
+    with open(transcript_path, "w") as text_file:
+        text_file.write(transcript_text)
+
+    return yt_meta_data

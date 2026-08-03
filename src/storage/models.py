@@ -1,5 +1,8 @@
+import uuid
+from datetime import datetime
+from typing import List, Optional
+
 from sqlalchemy import (
-    Column,
     DateTime,
     Float,
     ForeignKey,
@@ -7,9 +10,12 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
+    Uuid,
     func,
 )
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 Base = declarative_base()
 
@@ -17,40 +23,47 @@ Base = declarative_base()
 class Video(Base):
     __tablename__ = "videos"
 
-    id = Column(Integer, primary_key=True)
-    url = Column(String(1000), unique=True, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    url: Mapped[str] = mapped_column(
+        String(1000), unique=True, index=True, nullable=False
+    )
 
-    # Basic metadata
-    title = Column(String(500))
-    content_type = Column(
+    title: Mapped[Optional[str]] = mapped_column(String(500))
+    yt_creator: Mapped[Optional[str]] = mapped_column(String(500))
+    published_date: Mapped[Optional[str]] = mapped_column(String(100))
+
+    content_type: Mapped[Optional[str]] = mapped_column(
         String(100), index=True
     )  # stock_analysis, drama queen, macro, etc.
+    transcript_file_path: Mapped[Optional[str]] = mapped_column(String(500))
+    summary_file_path: Mapped[Optional[str]] = mapped_column(String(500))
+    summary_preview: Mapped[Optional[str]] = mapped_column(String(500))
 
-    # File paths (for archiving/recovery)
-    transcript_file = Column(String(500))  # archive/transcripts/...
-    summary_file = Column(String(500))  # archive/summaries/...
+    transcript_char_length: Mapped[Optional[int]] = mapped_column(Integer)
+    transcript_word_count: Mapped[Optional[int]] = mapped_column(Integer)
 
-    # Quick preview (for UI)
-    summary_preview = Column(String(500))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
-    # Metadata as JSON
-    metadata_json = Column(String)  # companies, dates, themes, etc.
-
-    # Processing info
-    transcript_length = Column(Integer)  # character count
-    processing_time_seconds = Column(Float)
-    model_used = Column(String(100))  # which Ollama model
-
-    # Timestamps
-    created_at = Column(DateTime, server_default=func.now(), index=True)
-    updated_at = Column(DateTime, server_default=func.now())
+    # Relationships
+    chunks: Mapped[List["TranscriptChunk"]] = relationship(
+        back_populates="video",
+        cascade="all, delete-orphan",
+        order_by="TranscriptChunk.chunk_index",
+    )
+    summaries: Mapped[List["Summary"]] = relationship(
+        back_populates="video",
+        cascade="all, delete-orphan",
+    )
 
     def to_dict(self):
         return {
-            "video_id": self.video_id,
             "title": self.title,
             "url": self.url,
-            "source_type": self.source_type,
             "content_type": self.content_type,
             "created_at": self.created_at.isoformat(),
         }
@@ -58,64 +71,75 @@ class Video(Base):
 
 class TranscriptChunk(Base):
     __tablename__ = "transcript_chunks"
-
-    id = Column(Integer, primary_key=True)
-    url = Column(String(1000), ForeignKey("videos.url"), index=True)
-
-    # Chunk identification
-    chunk_index = Column(Integer)  # 0, 1, 2, ... (for reassembly)
-
-    # The actual text
-    chunk_text = Column(Text)  # Full chunk text
-
-    # Chunk metrics
-    char_count = Column(Integer)
-    token_count = Column(Integer)
-    word_count = Column(Integer)  # approximate: len(text.split())
-
-    # Vector DB reference (not stored here)
-    vector_id = Column(String(100))  # ID in ChromaDB
-
-    # Timestamps
-    created_at = Column(DateTime, server_default=func.now())
-
     __table_args__ = (
-        # Composite index for efficient retrieval
-        Index("idx_video_chunk", "url", "chunk_index"),
+        UniqueConstraint("video_id", "chunk_index", name="uq_video_chunk_index"),
+        Index("idx_video_chunk", "video_id", "chunk_index"),
     )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
+    chunk_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    chunk_text: Mapped[str] = mapped_column(Text, nullable=False)
+
+    char_count: Mapped[Optional[int]] = mapped_column(Integer)
+    token_count: Mapped[Optional[int]] = mapped_column(Integer)
+    word_count: Mapped[Optional[int]] = mapped_column(Integer)
+    sentence_count: Mapped[Optional[int]] = mapped_column(Integer)
+
+    # Vector DB reference (not stored here),ID in ChromaDB
+    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    # Relationship
+    video: Mapped["Video"] = relationship(back_populates="chunks")
 
 
 class Summary(Base):
-    __tablename__ = "summaries"
+    __tablename__ = "transcript_summaries"
+    __table_args__ = (
+        UniqueConstraint("video_id", "full_text", name="uq_video_summary"),
+        Index("idx_video_summary", "video_id"),
+    )
 
-    id = Column(Integer, primary_key=True)
-    url = Column(String(1000), ForeignKey("videos.url"), unique=True, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
-    # Summary content
-    full_text = Column(Text)  # Full summary
+    full_text: Mapped[str] = mapped_column(Text, nullable=False)
 
-    # Summary metrics
-    char_count = Column(Integer)
-    token_count = Column(Integer)
-    word_count = Column(Integer)  # approximate: len(text.split())
+    char_count: Mapped[Optional[int]] = mapped_column(Integer)
+    token_count: Mapped[Optional[int]] = mapped_column(Integer)
+    word_count: Mapped[Optional[int]] = mapped_column(Integer)
+    model_used: Mapped[Optional[str]] = mapped_column(String(100))
+    system_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    user_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    processing_time_seconds: Mapped[Optional[float]] = mapped_column()
 
-    # Vector DB reference
-    vector_id = Column(String(100))  # ID in ChromaDB
+    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
 
-    # Processing details
-    model_used = Column(String(100))  # mistral, neural-chat, etc.
-    prompt_used = Column(String(100))  # version + stock_analysis, macro, etc.
-
-    created_at = Column(DateTime, server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    # Relationship
+    video: Mapped["Video"] = relationship(back_populates="summaries")
 
 
 class VideoTag(Base):
     __tablename__ = "video_tags"
 
-    id = Column(Integer, primary_key=True)
-    url = Column(String(1000), ForeignKey("videos.url"), index=True)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    tag_type: Mapped[Optional[str]] = mapped_column(String(50))
+    tag_value: Mapped[Optional[str]] = mapped_column(String(200))
 
-    tag_type = Column(String(50))  # company, sector, theme, etc.
-    tag_value = Column(String(200))  # NVDA, Technology, Earnings
-
-    created_at = Column(DateTime, server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
