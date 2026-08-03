@@ -39,9 +39,8 @@ class Video(Base):
     summary_file_path: Mapped[Optional[str]] = mapped_column(String(500))
     summary_preview: Mapped[Optional[str]] = mapped_column(String(500))
 
-    transcript_length: Mapped[Optional[int]] = mapped_column(Integer)
-    processing_time_seconds: Mapped[Optional[int]] = mapped_column(Float)
-    model_used: Mapped[Optional[str]] = mapped_column(String(100))
+    transcript_char_length: Mapped[Optional[int]] = mapped_column(Integer)
+    transcript_word_count: Mapped[Optional[int]] = mapped_column(Integer)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
@@ -59,7 +58,6 @@ class Video(Base):
     summaries: Mapped[List["Summary"]] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
-        order_by="Summary.full_text",
     )
 
     def to_dict(self):
@@ -89,6 +87,7 @@ class TranscriptChunk(Base):
     char_count: Mapped[Optional[int]] = mapped_column(Integer)
     token_count: Mapped[Optional[int]] = mapped_column(Integer)
     word_count: Mapped[Optional[int]] = mapped_column(Integer)
+    sentence_count: Mapped[Optional[int]] = mapped_column(Integer)
 
     # Vector DB reference (not stored here),ID in ChromaDB
     vector_id: Mapped[Optional[str]] = mapped_column(String(100))
@@ -101,10 +100,10 @@ class TranscriptChunk(Base):
 
 
 class Summary(Base):
-    __tablename__ = "summaries"
+    __tablename__ = "transcript_summaries"
     __table_args__ = (
-        UniqueConstraint("video_id", "chunk_index", name="uq_video_chunk_index"),
-        Index("idx_video_chunk", "video_id", "chunk_index"),
+        UniqueConstraint("video_id", "full_text", name="uq_video_summary"),
+        Index("idx_video_summary", "video_id"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
@@ -118,7 +117,9 @@ class Summary(Base):
     token_count: Mapped[Optional[int]] = mapped_column(Integer)
     word_count: Mapped[Optional[int]] = mapped_column(Integer)
     model_used: Mapped[Optional[str]] = mapped_column(String(100))
-    prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    system_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    user_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    processing_time_seconds: Mapped[Optional[float]] = mapped_column()
 
     vector_id: Mapped[Optional[str]] = mapped_column(String(100))
 

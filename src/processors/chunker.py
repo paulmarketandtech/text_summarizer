@@ -96,7 +96,7 @@ def get_file_path():
     files_to_process = [
         f
         for f in os.listdir(files_to_process_path)
-        if os.path.isfile(os.path.join(files_to_process_path, f))
+        if os.path.isfile(os.path.join(files_to_process_path, f))  # pyright: ignore
     ]
 
     return f"{files_to_process_path}/{files_to_process[0]}"
@@ -160,7 +160,6 @@ def chunk_by_sentences(
                     "sentence_count": len(current_chunk),
                     "start_sentence_idx": i,
                     "end_sentence_idx": j - 1,
-                    "document_type": "announcement",
                 },
             }
         )

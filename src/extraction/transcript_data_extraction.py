@@ -33,6 +33,7 @@ def extract_metadata_from_chunk(
         "load_duration": response["load_duration"],
         "total_duration": response["total_duration"],
     }
+
     # with open("chunk_metadata.jsonl", "a", encoding="utf-8") as f:
     #    f.write(json.dumps(llm_metadata) + "\n")
 
@@ -57,7 +58,7 @@ def extract_facts_from_chunk(
     )
 
     # TODO: over here embed chunk and llm metadata
-    raw_response = response["response"]
+    raw_response = response["response"]  # pyright: ignore
     try:
         data = json.loads(raw_response)
         if isinstance(data, list):
@@ -160,19 +161,29 @@ def process_transcript(all_chunks: list[dict]):
     for stock_name, stock_data in grouped_stocks.items():
         print(f"Synthesizing summary for: {stock_name}...")
         report = generate_stock_report(stock_name, stock_data)
-        final_output += report["response"] + "\n\n---\n"
+        final_output += report["response"] + "\n\n---\n"  # pyright: ignore
 
     return final_output
 
 
-def report_generator(file_name: str, all_chunks: list[dict]):
+def report_generator(file_name: str, all_chunks: list[dict]) -> tuple[str, str]:
     full_report = process_transcript(all_chunks)
     # TODO: embed full report over here?
 
     splitted_file_name = file_name.split("_")
     # change the _tanscript word to _summarized
     output_file_name = "_".join(splitted_file_name[:-1]) + "_summarized.md"
-    with open(f"./outputs/{output_file_name}", "w", encoding="utf-8") as f:
+    output_report_path = f"./outputs/{output_file_name}"
+
+    with open(output_report_path, "w", encoding="utf-8") as f:
         f.write(full_report)
 
     print(f"\nDone! Saved to {output_file_name}")
+
+    return output_report_path, full_report
+    """
+    return {
+        "output_report_path": output_report_path,
+        "full_report": full_report,
+    }
+    """

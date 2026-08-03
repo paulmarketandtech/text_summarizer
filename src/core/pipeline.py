@@ -1,5 +1,5 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
-from src.processors import chunker, vectorizer
+from src.processors import chunker, db_population, vectorizer
 from src.storage import database
 
 """
@@ -17,11 +17,17 @@ vectorize chunks (still in memory) and save to DB with all metadata for future R
 
 def main():
     url = "https://youtu.be/BgRm41EcU6c?si=2cRMNFAgm8mUEblT"
-    youtube_transcript.create_video_transcript(url)
+    yt_metadata = youtube_transcript.create_video_transcript(url)
 
     file_name, sent_chunks = chunker.get_sentence_chunks(4000)
 
-    # transcript_data_extraction.report_generator(file_name, sent_chunks)
+    output_report_path, full_report = transcript_data_extraction.report_generator(
+        file_name, sent_chunks
+    )
+
+    db_population.db_population_manager(
+        yt_metadata, sent_chunks, output_report_path, full_report
+    )
 
     # vectorizer.vectorize_text(sent_chunks)
 
