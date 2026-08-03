@@ -1,31 +1,7 @@
-"""
-types of metadata:
-yt_metadata
-chunks_metadata
-llm_metadata
-
-+
-summarization
-"""
-
 import uuid
 
-from sqlalchemy.orm import Session
-
 from src.storage.database import get_session  # noqa: E402
-from src.storage.models import Summary, TranscriptChunk, Video  # noqa: E402
-
-
-def yt_db_population(yt_meta_data: dict, transcript_text: str):
-    with get_session() as session:
-        yt_md = Video(
-            url=yt_meta_data["url"],
-            title=yt_meta_data["title"],
-            yt_creator=yt_meta_data["uploader_id"],
-            published_date=yt_meta_data["published_date"],
-        )
-        session.add(yt_md)
-        session.commit()
+from src.storage.models import LLMChunkMetaData, Summary, TranscriptChunk, Video
 
 
 def db_population_manager(
@@ -68,6 +44,21 @@ def db_population_manager(
                     char_count=metadata.get("char_count"),
                     word_count=metadata.get("word_count"),
                     sentence_count=metadata.get("sentence_count"),
+                )
+            )
+
+        for llm_chunk in llm_chunks_metadata:
+            video.llm_chunks.append(
+                LLMChunkMetaData(
+                    chunk_index=llm_chunk["chunk_index"],
+                    model_used=llm_chunk["model"],
+                    created_at_llm=llm_chunk["created_at"],
+                    eval_count=llm_chunk["eval_count"],
+                    eval_duration=llm_chunk["eval_duration"],
+                    prompt_eval_count=llm_chunk["prompt_eval_count"],
+                    prompt_eval_duration=llm_chunk["prompt_eval_duration"],
+                    load_duration=llm_chunk["load_duration"],
+                    total_duration=llm_chunk["total_duration"],
                 )
             )
 
