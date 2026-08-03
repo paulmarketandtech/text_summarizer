@@ -55,6 +55,10 @@ class Video(Base):
         cascade="all, delete-orphan",
         order_by="TranscriptChunk.chunk_index",
     )
+    llm_chunks: Mapped[List["LLMChunkMetaData"]] = relationship(
+        back_populates="video",
+        cascade="all, delete-orphan",
+    )
     summaries: Mapped[List["Summary"]] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
@@ -97,6 +101,38 @@ class TranscriptChunk(Base):
     )
     # Relationship
     video: Mapped["Video"] = relationship(back_populates="chunks")
+
+
+class LLMChunkMetaData(Base):
+    __tablename__ = "llm_chunk_metadata"
+    __table_args__ = (
+        UniqueConstraint("video_id", "chunk_index", name="uq_video_llmchunk_index"),
+        Index("idx_video_llmchunk", "video_id", "chunk_index"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
+    chunk_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    model_used: Mapped[Optional[str]] = mapped_column(String(100))
+    created_at_llm: Mapped[Optional[int]] = mapped_column(Integer)
+    eval_count: Mapped[Optional[int]] = mapped_column(Integer)
+    eval_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    prompt_eval_count: Mapped[Optional[int]] = mapped_column(Integer)
+    prompt_eval_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    load_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    total_duration: Mapped[Optional[int]] = mapped_column(Integer)
+
+    # Vector DB reference (not stored here),ID in ChromaDB
+    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    # Relationship
+    video: Mapped["Video"] = relationship(back_populates="llm_chunks")
 
 
 class Summary(Base):
