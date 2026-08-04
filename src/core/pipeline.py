@@ -7,8 +7,9 @@ Workflow:
 user provides yt url 
 download and save transcript plus metadata from api
 chunk it, few more metadata like chunk size, number of them 
-summarize. ollama creates here also some metadata
-concatinate all chunks and summarize it once again
+Extracts data from chunks. ollama creates here also some metadata -> json
+aggregate json data and based on that create end report
+save everything to sql DB
 send back to the user the final output and archive it - add logic to move the file
 
 vectorize chunks (still in memory) and save to DB with all metadata for future RAG
