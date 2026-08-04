@@ -63,6 +63,10 @@ class Video(Base):
         back_populates="video",
         cascade="all, delete-orphan",
     )
+    stockSummaries: Mapped[List["SingleStockSummary"]] = relationship(
+        back_populates="video",
+        cascade="all, delete-orphan",
+    )
 
     def to_dict(self):
         return {
@@ -148,13 +152,9 @@ class Summary(Base):
     )
 
     full_text: Mapped[str] = mapped_column(Text, nullable=False)
-
     char_count: Mapped[Optional[int]] = mapped_column(Integer)
-    token_count: Mapped[Optional[int]] = mapped_column(Integer)
     word_count: Mapped[Optional[int]] = mapped_column(Integer)
-    model_used: Mapped[Optional[str]] = mapped_column(String(100))
-    system_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
-    user_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    # full time will be provided from python script
     processing_time_seconds: Mapped[Optional[float]] = mapped_column()
 
     vector_id: Mapped[Optional[str]] = mapped_column(String(100))
@@ -164,6 +164,41 @@ class Summary(Base):
     )
     # Relationship
     video: Mapped["Video"] = relationship(back_populates="summaries")
+
+
+class SingleStockSummary(Base):
+    __tablename__ = "single_stock_summary"
+    __table_args__ = (
+        UniqueConstraint("video_id", "stock_name", name="uq_video_stockSummary"),
+        Index("idx_video_stockSummary", "video_id"),
+    )
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    stock_name: Mapped[Optional[str]] = mapped_column(String(100))
+    stock_full_text: Mapped[str] = mapped_column(Text, nullable=False)
+    char_count: Mapped[Optional[int]] = mapped_column(Integer)
+    word_count: Mapped[Optional[int]] = mapped_column(Integer)
+
+    model_used: Mapped[Optional[str]] = mapped_column(String(100))
+    created_at_llm: Mapped[Optional[int]] = mapped_column(Integer)
+    eval_count: Mapped[Optional[int]] = mapped_column(Integer)
+    eval_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    prompt_eval_count: Mapped[Optional[int]] = mapped_column(Integer)
+    prompt_eval_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    load_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    total_duration: Mapped[Optional[int]] = mapped_column(Integer)
+    system_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    user_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+
+    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    # Relationship
+    video: Mapped["Video"] = relationship(back_populates="stockSummaries")
 
 
 class VideoTag(Base):

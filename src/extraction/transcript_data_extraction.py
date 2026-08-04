@@ -101,7 +101,7 @@ def aggregate_extracted_data(
     return grouped_stocks
 
 
-def generate_stock_report(stock_name: str, stock_data: dict) -> str:
+def generate_stock_report(stock_name: str, stock_data: dict) -> tuple[dict, dict]:
     config = prompts["synthesis_json_data"]
     synthesis_system_template = config["system"]
     synthesis_user_template = config["user"]
@@ -119,14 +119,17 @@ def generate_stock_report(stock_name: str, stock_data: dict) -> str:
     response = llm.generate(
         user_prompt=prompt, system_prompt=synthesis_system_template, json_mode=False
     )
-    """
-    have to figure out how to collect and save metada from final report since it's also generated not by chunks but by stocks
-    llm_report_metadata = extract_metadata_from_chunk(response)
-    llm_report_metadata["user_prompt"] = synthesis_user_template
-    llm_report_metadata["system_prompt"] = synthesis_system_template
-    """
 
-    return response
+    stock_summary = response["response"]
+    llm_stock_metadata = extract_metadata_from_chunk(response)
+    llm_stock_metadata["stock_name"] = stock_name
+    llm_stock_metadata["user_prompt_used"] = synthesis_user_template
+    llm_stock_metadata["system_prompt_used"] = synthesis_system_template
+    llm_stock_metadata["stock_full_text"] = stock_summary
+    llm_stock_metadata["char_count"] = len(stock_summary)
+    llm_stock_metadata["word_count"] = len(stock_summary.split())
+
+    return response, llm_stock_metadata  # pyright: ignore
 
 
 def process_transcript(all_chunks: list[dict]):
@@ -140,8 +143,8 @@ def process_transcript(all_chunks: list[dict]):
         facts, llm_chunk_metadata = extract_facts_from_chunk(chunk["text"])
         all_extractions.append(facts)
 
-        llm_chunk_metadata["chunk_index"] = idx
-        llm_chunk_metadata["total_chunks_number"] = len(all_chunks)
+        llm_chunk_metadata["chunk_index"] = idx  # pyright: ignore
+        llm_chunk_metadata["total_chunks_number"] = len(all_chunks)  # pyright: ignore
         llm_chunks_metadata.append(llm_chunk_metadata)
 
     print("\n3. Aggregating facts per company...")
@@ -152,16 +155,20 @@ def process_transcript(all_chunks: list[dict]):
     print("\n4. Generating final reports per company...\n")
     final_output = f"# Stock Analysis Report\n**Companies Found:** {', '.join(detected_companies)}\n\n---\n"
 
+    llm_stocks_metadata = []
     for stock_name, stock_data in grouped_stocks.items():
         print(f"Synthesizing summary for: {stock_name}...")
-        report = generate_stock_report(stock_name, stock_data)
+        report, llm_stock_metadata = generate_stock_report(stock_name, stock_data)
         final_output += report["response"] + "\n\n---\n"  # pyright: ignore
+        llm_stocks_metadata.append(llm_stock_metadata)
 
-    return final_output, llm_chunks_metadata
+    return final_output, llm_chunks_metadata, llm_stocks_metadata
 
 
 def report_generator(file_name: str, all_chunks: list[dict]) -> tuple[list, dict]:
-    full_report, llm_chunks_metadata = process_transcript(all_chunks)
+    full_report, llm_chunks_metadata, llm_stocks_metadata = process_transcript(
+        all_chunks
+    )
     # TODO: embed full report over here?
 
     splitted_file_name = file_name.split("_")
@@ -178,4 +185,4 @@ def report_generator(file_name: str, all_chunks: list[dict]) -> tuple[list, dict
     llm_report_metadata["output_report_path"] = output_report_path
     llm_report_metadata["full_report"] = full_report
 
-    return llm_chunks_metadata, llm_report_metadata
+    return llm_chunks_metadata, llm_stocks_metadata, llm_report_metadata
