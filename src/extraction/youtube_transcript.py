@@ -69,6 +69,8 @@ def create_video_transcript(url) -> dict:
 
     yt_meta_data["transcript_path"] = transcript_path
     yt_meta_data["transcript_text"] = transcript_text
+    yt_meta_data["transcript_char_length"] = len(transcript_text)
+    yt_meta_data["transcript_word_count"] = len(transcript_text.split())
 
     with open(transcript_path, "w") as text_file:
         text_file.write(transcript_text)
