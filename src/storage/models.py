@@ -4,10 +4,8 @@ from typing import List, Optional
 
 from sqlalchemy import (
     DateTime,
-    Float,
     ForeignKey,
     Index,
-    Integer,
     String,
     Text,
     UniqueConstraint,
@@ -89,11 +87,10 @@ class TranscriptChunk(Base):
         Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
-    chunk_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    chunk_index: Mapped[int] = mapped_column(nullable=False)
     chunk_text: Mapped[str] = mapped_column(Text, nullable=False)
 
     char_count: Mapped[Optional[int]] = mapped_column()
-    token_count: Mapped[Optional[int]] = mapped_column()
     word_count: Mapped[Optional[int]] = mapped_column()
     sentence_count: Mapped[Optional[int]] = mapped_column()
 
@@ -119,11 +116,12 @@ class LLMChunkMetaData(Base):
         Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
-    chunk_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    chunk_index: Mapped[int] = mapped_column(nullable=False)
     model_used: Mapped[Optional[str]] = mapped_column(String(100))
     created_at_llm: Mapped[Optional[int]] = mapped_column()
     eval_count: Mapped[Optional[int]] = mapped_column()
     eval_duration: Mapped[Optional[int]] = mapped_column()
+    tokens_per_second: Mapped[Optional[float]] = mapped_column()
     prompt_eval_count: Mapped[Optional[int]] = mapped_column()
     prompt_eval_duration: Mapped[Optional[int]] = mapped_column()
     load_duration: Mapped[Optional[int]] = mapped_column()
@@ -154,7 +152,6 @@ class Summary(Base):
     full_text: Mapped[str] = mapped_column(Text, nullable=False)
     char_count: Mapped[Optional[int]] = mapped_column()
     word_count: Mapped[Optional[int]] = mapped_column()
-    # full time will be provided from python script
     processing_time_seconds: Mapped[Optional[float]] = mapped_column()
 
     vector_id: Mapped[Optional[str]] = mapped_column(String(100))
@@ -185,6 +182,7 @@ class SingleStockSummary(Base):
     created_at_llm: Mapped[Optional[int]] = mapped_column()
     eval_count: Mapped[Optional[int]] = mapped_column()
     eval_duration: Mapped[Optional[int]] = mapped_column()
+    tokens_per_second: Mapped[Optional[float]] = mapped_column()
     prompt_eval_count: Mapped[Optional[int]] = mapped_column()
     prompt_eval_duration: Mapped[Optional[int]] = mapped_column()
     load_duration: Mapped[Optional[int]] = mapped_column()
