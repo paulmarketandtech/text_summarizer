@@ -16,7 +16,7 @@ send back to the user the final output and archive it - add logic to move the fi
 vectorize chunks (still in memory) and save to DB with all metadata for future RAG
 """
 
-url = "https://youtu.be/BgRm41EcU6c?si=2cRMNFAgm8mUEblT"
+url = "https://youtu.be/LsL8qvaI9cQ?si=dgzuJHhqjcyI-1is"
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
 
     file_name, sent_chunks = chunker.get_sentence_chunks(4000)
 
-    llm_chunks_metadata, llm_stocks_metadata, llm_report_metadata = (
+    llm_chunks_metadata, llm_stocks_metadata, llm_report_metadata = (  # pyright: ignore
         transcript_data_extraction.report_generator(file_name, sent_chunks)
     )
 
@@ -48,4 +48,4 @@ if __name__ == "__main__":
     execution_time = t.elapsed
     print(f"one more time time: {execution_time}")
 
-    db_population.update_full_processing_time(execution_time, url)
+    db_population.update_full_processing_time(execution_time, url)  # pyright: ignore
