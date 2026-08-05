@@ -16,12 +16,15 @@ llm = llm_client.OllamaClient()
 def extract_metadata_from_chunk(
     response,
 ):
-
+    tokens_per_second = response["eval_count"] / (
+        response["eval_duration"] / 1_000_000_000
+    )  # nanoseconds
     return {
         "model": response["model"],
         "created_at": response["created_at"],
         "eval_count": response["eval_count"],
         "eval_duration": response["eval_duration"],
+        "tokens_per_second": round(tokens_per_second, 2),
         "prompt_eval_count": response["prompt_eval_count"],
         "prompt_eval_duration": response["prompt_eval_duration"],
         "load_duration": response["load_duration"],
