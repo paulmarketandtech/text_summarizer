@@ -8,7 +8,7 @@ load_dotenv()
 from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 
-def get_video_info(url):
+def get_video_info(url: str) -> dict:
     ydl_opts = {"quiet": True, "no_warnings": True}
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore
@@ -21,7 +21,7 @@ def get_video_info(url):
         }
 
 
-def extract_youtube_id(url):
+def extract_youtube_id(url: str) -> str | None:
     """
     Extracts the YouTube video ID from various YouTube URL formats.
 
@@ -45,7 +45,7 @@ def extract_youtube_id(url):
     return None
 
 
-def create_video_transcript(url) -> dict:
+def create_video_transcript(url) -> tuple[str, dict]:
     """Creates transcript of a given YT video and saves it as .txt
     Returns metadata from YT"""
 
@@ -72,7 +72,4 @@ def create_video_transcript(url) -> dict:
     yt_meta_data["transcript_char_length"] = len(transcript_text)
     yt_meta_data["transcript_word_count"] = len(transcript_text.split())
 
-    with open(transcript_path, "w") as text_file:
-        text_file.write(transcript_text)
-
-    return yt_meta_data
+    return transcript_text, yt_meta_data

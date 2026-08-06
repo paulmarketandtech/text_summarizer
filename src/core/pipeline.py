@@ -6,21 +6,19 @@ from src.utils.timer import Timer
 """
 Workflow:
 user provides yt url 
-download and save transcript plus metadata from api
+download the transcript and pass it plus metadata from api
 chunk it, few more metadata like chunk size, number of them 
 Extracts data from chunks. ollama creates here also some metadata -> json
 aggregate json data and based on that create end report
-save everything to sql DB
-send back to the user the final output and archive it - add logic to move the file
-
-vectorize chunks (still in memory) and save to DB with all metadata for future RAG
+save everything to sql DB and chromaDB
+send back to the user the final output and archive the transcript and final output 
 """
 
 url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
 
 
 def main():
-    yt_metadata = youtube_transcript.create_video_transcript(url)
+    raw_transcript, yt_metadata = youtube_transcript.create_video_transcript(url)
 
     file_name, sent_chunks = chunker.get_sentence_chunks(4000)
 
