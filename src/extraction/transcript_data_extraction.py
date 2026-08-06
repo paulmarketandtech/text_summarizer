@@ -4,7 +4,6 @@ from collections import defaultdict
 import yaml
 
 from src.core import llm_client
-from src.processors import vectorizer
 
 with open("../../config/prompts.yaml", "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
@@ -166,26 +165,3 @@ def process_transcript(all_chunks: list[dict]):
         llm_stocks_metadata.append(llm_stock_metadata)
 
     return final_output, llm_chunks_metadata, llm_stocks_metadata
-
-
-def report_generator(file_name: str, all_chunks: list[dict]) -> tuple[list, dict]:
-    full_report, llm_chunks_metadata, llm_stocks_metadata = process_transcript(
-        all_chunks
-    )
-    # TODO: embed full report over here?
-
-    splitted_file_name = file_name.split("_")
-    # change the _tanscript word to _summarized
-    output_file_name = "_".join(splitted_file_name[:-1]) + "_summarized.md"
-    output_report_path = f"./outputs/{output_file_name}"
-
-    with open(output_report_path, "w", encoding="utf-8") as f:
-        f.write(full_report)
-
-    print(f"\nDone! Saved to {output_file_name}")
-
-    llm_report_metadata = {}
-    llm_report_metadata["output_report_path"] = output_report_path
-    llm_report_metadata["full_report"] = full_report
-
-    return llm_chunks_metadata, llm_stocks_metadata, llm_report_metadata

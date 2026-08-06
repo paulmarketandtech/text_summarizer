@@ -1,6 +1,7 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
 from src.processors import chunker, db_population
 from src.storage import database
+from src.utils.files_operations import create_final_report_metadata
 from src.utils.timer import Timer
 
 """
@@ -20,10 +21,16 @@ url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
 def main():
     raw_transcript, yt_metadata = youtube_transcript.create_video_transcript(url)
 
-    file_name, sent_chunks = chunker.get_sentence_chunks(4000)
+    sent_chunks = chunker.chunk_by_sentences(
+        raw_transcript=raw_transcript, max_chunk_size=4000
+    )
 
-    llm_chunks_metadata, llm_stocks_metadata, llm_report_metadata = (  # pyright: ignore
-        transcript_data_extraction.report_generator(file_name, sent_chunks)
+    final_report, llm_chunks_metadata, llm_stocks_metadata = (  # pyright: ignore
+        transcript_data_extraction.process_transcript(sent_chunks)
+    )
+
+    llm_report_metadata = create_final_report_metadata(
+        final_report, yt_metadata["transcript_file_name"]
     )
 
     db_population.db_population_manager(
@@ -33,6 +40,8 @@ def main():
         llm_stocks_metadata,
         llm_report_metadata,
     )
+    # archive files
+    # file_manager(transcript_file_name,raw_transcript, output)
 
 
 if __name__ == "__main__":

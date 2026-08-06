@@ -1,6 +1,4 @@
-import os
 import re
-from pathlib import Path
 from typing import Dict, List
 
 from dotenv import load_dotenv
@@ -89,39 +87,15 @@ def clean_transcript(text: str) -> str:
     return text
 
 
-def get_file_path():
-    files_to_process_path = os.getenv("FILE_TO_PROCESS_PATH")
-
-    # List only files in the top-level directory
-    files_to_process = [
-        f
-        for f in os.listdir(files_to_process_path)
-        if os.path.isfile(os.path.join(files_to_process_path, f))  # pyright: ignore
-    ]
-
-    return f"{files_to_process_path}/{files_to_process[0]}"
-
-
-def read_document(file_path: str) -> tuple[str, str]:
-    path = Path(file_path)
-    file_name = path.name
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
-
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    return file_name, content
-
-
 def chunk_by_sentences(
-    text: str, max_chunk_size: int = 1000, overlap_sentences: int = 2
+    raw_transcript: str, max_chunk_size: int = 1000, overlap_sentences: int = 2
 ) -> List[Dict]:
     """
-    Chunk text by sentences with configurable overlap.
+    Chunk cleaned transcript by sentences with configurable overlap.
     """
+    cleaned_transcript = clean_transcript(raw_transcript)
 
-    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    sentences = re.split(r"(?<=[.!?])\s+", cleaned_transcript.strip())
     sentences = [s.strip() for s in sentences if s.strip()]
 
     chunks = []
@@ -173,19 +147,3 @@ def chunk_by_sentences(
             i = j  # No overlap
 
     return chunks[:-2]
-
-
-def get_sentence_chunks(max_chunk_size: int):
-    file_path = get_file_path()
-    file_name, raw_text = read_document(file_path)
-    print(file_name)
-
-    cleaned_text = clean_transcript(raw_text)
-    sent_chunks = chunk_by_sentences(cleaned_text, max_chunk_size)
-
-    """
-    chunks = [chunk['text'] for chunk in sent_chunks]
-    with open(f"./chunk_outputs/chunks_{file_name}") as file:
-        file.write()
-    """
-    return file_name, sent_chunks

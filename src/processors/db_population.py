@@ -33,7 +33,8 @@ def db_population_manager(
                 title=yt_metadata.get("title"),
                 yt_creator=yt_metadata.get("uploader_id"),
                 published_date=yt_metadata.get("published_date"),
-                transcript_file_path=yt_metadata.get("transcript_path"),
+                transcript_file_name=yt_metadata.get("transcript_file_name"),
+                # TODO: change it here and in models
                 summary_file_path=llm_report_metadata.get("output_report_path"),
                 summary_preview=full_report[:490],  # max char is 500, just to be sure
                 transcript_char_length=yt_metadata.get("transcript_char_length"),
@@ -131,7 +132,7 @@ def db_population_manager(
         video.summaries.append(
             Summary(
                 # video_id=video.id,
-                full_text=full_report,
+                final_report=full_report,
                 char_count=len(full_report),
                 word_count=len(full_report.split()),
             )

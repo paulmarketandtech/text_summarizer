@@ -33,7 +33,7 @@ class Video(Base):
     content_type: Mapped[Optional[str]] = mapped_column(
         String(100), index=True
     )  # stock_analysis, drama queen, macro, etc.
-    transcript_file_path: Mapped[Optional[str]] = mapped_column(String(500))
+    transcript_file_name: Mapped[Optional[str]] = mapped_column(String(500))
     summary_file_path: Mapped[Optional[str]] = mapped_column(String(500))
     summary_preview: Mapped[Optional[str]] = mapped_column(String(500))
 
@@ -140,7 +140,7 @@ class LLMChunkMetaData(Base):
 class Summary(Base):
     __tablename__ = "transcript_summaries"
     __table_args__ = (
-        UniqueConstraint("video_id", "full_text", name="uq_video_summary"),
+        UniqueConstraint("video_id", "final_report", name="uq_video_summary"),
         Index("idx_video_summary", "video_id"),
     )
 
@@ -149,7 +149,7 @@ class Summary(Base):
         Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
-    full_text: Mapped[str] = mapped_column(Text, nullable=False)
+    final_report: Mapped[str] = mapped_column(Text, nullable=False)
     char_count: Mapped[Optional[int]] = mapped_column()
     word_count: Mapped[Optional[int]] = mapped_column()
     processing_time_seconds: Mapped[Optional[float]] = mapped_column()

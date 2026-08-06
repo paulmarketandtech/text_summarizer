@@ -64,12 +64,11 @@ def create_video_transcript(url) -> tuple[str, dict]:
     )
     channel_name_clean = re.sub(r"[^a-zA-Z0-9\\s]", "", channel_name_capitalized)
 
-    filename = f"yt_{yt_meta_data['published_date']}_{channel_name_clean}_{video_id}"
-    transcript_path = f"{os.getenv('FILE_TO_PROCESS_PATH')}/{filename}_transcript.txt"
+    filename = f"yt_{yt_meta_data['published_date']}_{channel_name_clean}_{video_id}_transcript.txt"
 
-    yt_meta_data["transcript_path"] = transcript_path
+    yt_meta_data["transcript_file_name"] = filename
     yt_meta_data["transcript_text"] = transcript_text
     yt_meta_data["transcript_char_length"] = len(transcript_text)
     yt_meta_data["transcript_word_count"] = len(transcript_text.split())
 
-    return transcript_text, yt_meta_data
+    return (transcript_text, yt_meta_data)
