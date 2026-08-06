@@ -11,5 +11,6 @@ def create_final_report_metadata(final_report: str, transcript_file_name: str) -
     final_report_metadata["final_report"] = final_report
     final_report_metadata["char_count"] = len(final_report)
     final_report_metadata["word_count"] = len(final_report.split())
+    final_report_metadata["summary_preview"] = final_report[:490]
 
     return final_report_metadata

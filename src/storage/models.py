@@ -34,7 +34,7 @@ class Video(Base):
         String(100), index=True
     )  # stock_analysis, drama queen, macro, etc.
     transcript_file_name: Mapped[Optional[str]] = mapped_column(String(500))
-    summary_file_path: Mapped[Optional[str]] = mapped_column(String(500))
+    summary_file_name: Mapped[Optional[str]] = mapped_column(String(500))
     summary_preview: Mapped[Optional[str]] = mapped_column(String(500))
 
     transcript_char_length: Mapped[Optional[int]] = mapped_column()

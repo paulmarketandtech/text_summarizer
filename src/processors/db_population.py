@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import update
 
-from src.storage.database import get_session  # noqa: E402
+from src.storage.database import get_session
 from src.storage.models import (
     LLMChunkMetaData,
     SingleStockSummary,
@@ -18,10 +18,9 @@ def db_population_manager(
     sent_chunks: list[dict],
     llm_chunks_metadata: list[dict],
     llm_stocks_metadata: list[dict],
-    llm_report_metadata: dict,
+    final_report_metadata: dict,
 ):
     vector_db = VectorDBManager()
-    full_report = llm_report_metadata.get("full_report")
 
     with get_session() as session:
         video = session.query(Video).filter_by(url=yt_metadata["url"]).one_or_none()
@@ -34,9 +33,8 @@ def db_population_manager(
                 yt_creator=yt_metadata.get("uploader_id"),
                 published_date=yt_metadata.get("published_date"),
                 transcript_file_name=yt_metadata.get("transcript_file_name"),
-                # TODO: change it here and in models
-                summary_file_path=llm_report_metadata.get("output_report_path"),
-                summary_preview=full_report[:490],  # max char is 500, just to be sure
+                summary_file_name=final_report_metadata.get("summary_file_name"),
+                summary_preview=final_report_metadata["summary_preview"],
                 transcript_char_length=yt_metadata.get("transcript_char_length"),
                 transcript_word_count=yt_metadata.get("transcript_word_count"),
             )
@@ -52,7 +50,6 @@ def db_population_manager(
             # char_count = chunk.get("metadata", {}).get("char_count")
             video.chunks.append(
                 TranscriptChunk(
-                    # video_id=video.id,  # ← UUID reference
                     chunk_index=chunk["id"],
                     chunk_text=chunk["text"],
                     char_count=metadata.get("char_count"),
@@ -132,16 +129,16 @@ def db_population_manager(
         video.summaries.append(
             Summary(
                 # video_id=video.id,
-                final_report=full_report,
-                char_count=len(full_report),
-                word_count=len(full_report.split()),
+                final_report=final_report_metadata["final_report"],
+                char_count=final_report_metadata["char_count"],
+                word_count=final_report_metadata["word_count"],
             )
         )
 
         # Add to ChromaDB
         vector_db.add_video_summary(
             summary_id=str(video.id),
-            text=full_report,
+            text=final_report_metadata["final_report"],
             metadata=[
                 {
                     "video_id": str(video.id),
