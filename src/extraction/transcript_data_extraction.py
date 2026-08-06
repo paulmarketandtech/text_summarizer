@@ -4,34 +4,16 @@ from collections import defaultdict
 import yaml
 
 from src.core import llm_client
+from src.utils.create_report_metadata import (
+    create_response_metadata,
+    create_stock_metadata,
+)
 
 with open("../../config/prompts.yaml", "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
 
 
 llm = llm_client.OllamaClient()
-
-
-def extract_metadata_from_chunk(
-    response,
-):
-    tokens_per_second = response["eval_count"] / (
-        response["eval_duration"] / 1_000_000_000
-    )  # nanoseconds
-    return {
-        "model": response["model"],
-        "created_at": response["created_at"],
-        "eval_count": response["eval_count"],
-        "eval_duration": response["eval_duration"],
-        "tokens_per_second": round(tokens_per_second, 2),
-        "prompt_eval_count": response["prompt_eval_count"],
-        "prompt_eval_duration": response["prompt_eval_duration"],
-        "load_duration": response["load_duration"],
-        "total_duration": response["total_duration"],
-    }
-
-    # with open("chunk_metadata.jsonl", "a", encoding="utf-8") as f:
-    #    f.write(json.dumps(llm_metadata) + "\n")
 
 
 def extract_facts_from_chunk(chunk: str):
@@ -44,11 +26,10 @@ def extract_facts_from_chunk(chunk: str):
         user_prompt=prompt, system_prompt=system_prompt, json_mode=True
     )
 
-    llm_chunk_metadata = extract_metadata_from_chunk(response)
+    llm_chunk_metadata = create_response_metadata(response)
     llm_chunk_metadata["user_prompt"] = prompt
     llm_chunk_metadata["system_prompt"] = system_prompt
 
-    # TODO: over here embed chunk and llm metadata
     raw_response = response["response"]  # pyright: ignore
     try:
         data = json.loads(raw_response)
@@ -103,7 +84,7 @@ def aggregate_extracted_data(
     return grouped_stocks
 
 
-def generate_stock_report(stock_name: str, stock_data: dict) -> tuple[dict, dict]:
+def generate_stock_report(stock_name: str, stock_data: dict) -> dict:
     config = prompts["synthesis_json_data"]
     synthesis_system_template = config["system"]
     synthesis_user_template = config["user"]
@@ -122,16 +103,11 @@ def generate_stock_report(stock_name: str, stock_data: dict) -> tuple[dict, dict
         user_prompt=prompt, system_prompt=synthesis_system_template, json_mode=False
     )
 
-    stock_summary = response["response"]
-    llm_stock_metadata = extract_metadata_from_chunk(response)
-    llm_stock_metadata["stock_name"] = stock_name
-    llm_stock_metadata["user_prompt_used"] = synthesis_user_template
-    llm_stock_metadata["system_prompt_used"] = synthesis_system_template
-    llm_stock_metadata["stock_full_text"] = stock_summary
-    llm_stock_metadata["char_count"] = len(stock_summary)
-    llm_stock_metadata["word_count"] = len(stock_summary.split())
+    llm_stock_metadata = create_stock_metadata(
+        response, stock_name, synthesis_user_template, synthesis_system_template
+    )
 
-    return response, llm_stock_metadata  # pyright: ignore
+    return llm_stock_metadata
 
 
 def process_transcript(all_chunks: list[dict]):
@@ -145,8 +121,8 @@ def process_transcript(all_chunks: list[dict]):
         facts, llm_chunk_metadata = extract_facts_from_chunk(chunk["text"])
         all_extractions.append(facts)
 
-        llm_chunk_metadata["chunk_index"] = idx  # pyright: ignore
-        llm_chunk_metadata["total_chunks_number"] = len(all_chunks)  # pyright: ignore
+        llm_chunk_metadata["chunk_index"] = idx
+        llm_chunk_metadata["total_chunks_number"] = len(all_chunks)
         llm_chunks_metadata.append(llm_chunk_metadata)
 
     print("\n3. Aggregating facts per company...")
@@ -160,8 +136,8 @@ def process_transcript(all_chunks: list[dict]):
     llm_stocks_metadata = []
     for stock_name, stock_data in grouped_stocks.items():
         print(f"Synthesizing summary for: {stock_name}...")
-        report, llm_stock_metadata = generate_stock_report(stock_name, stock_data)
-        final_output += report["response"] + "\n\n---\n"  # pyright: ignore
+        llm_stock_metadata = generate_stock_report(stock_name, stock_data)
+        final_output += llm_stock_metadata["stock_full_text"] + "\n\n---\n"
         llm_stocks_metadata.append(llm_stock_metadata)
 
     return final_output, llm_chunks_metadata, llm_stocks_metadata
