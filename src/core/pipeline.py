@@ -1,5 +1,5 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
-from src.processors import chunker, db_population, vectorizer
+from src.processors import chunker, db_population
 from src.storage import database
 from src.utils.timer import Timer
 
@@ -16,7 +16,7 @@ send back to the user the final output and archive it - add logic to move the fi
 vectorize chunks (still in memory) and save to DB with all metadata for future RAG
 """
 
-url = "https://youtu.be/LsL8qvaI9cQ?si=dgzuJHhqjcyI-1is"
+url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
 
 
 def main():
@@ -35,8 +35,6 @@ def main():
         llm_stocks_metadata,
         llm_report_metadata,
     )
-
-    # vectorizer.vectorize_text(sent_chunks)
 
 
 if __name__ == "__main__":

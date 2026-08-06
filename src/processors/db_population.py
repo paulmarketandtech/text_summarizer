@@ -10,6 +10,7 @@ from src.storage.models import (
     TranscriptChunk,
     Video,
 )
+from src.storage.vector_db import VectorDBManager
 
 
 def db_population_manager(
@@ -19,6 +20,7 @@ def db_population_manager(
     llm_stocks_metadata: list[dict],
     llm_report_metadata: dict,
 ):
+    vector_db = VectorDBManager()
     full_report = llm_report_metadata.get("full_report")
 
     with get_session() as session:
@@ -39,6 +41,10 @@ def db_population_manager(
             )
             session.add(video)
 
+        vector_chunk_ids = []
+        vector_chunk_texts = []
+        vector_chunk_metadas = []
+
         for chunk in sent_chunks:
             metadata = chunk.get("metadata") or {}
             # example for single nested extraction
@@ -53,6 +59,20 @@ def db_population_manager(
                     sentence_count=metadata.get("sentence_count"),
                 )
             )
+            vector_chunk_ids.append(f"{video.id}_chunk_{chunk['id']}")
+            vector_chunk_texts.append(chunk["text"])
+            vector_chunk_metadas.append(
+                {
+                    "video_id": str(video.id),
+                    "chunk_index": chunk["id"],
+                }
+            )
+        # Add to ChromaDB
+        vector_db.add_original_chunk(
+            chunk_ids=vector_chunk_ids,
+            texts=vector_chunk_texts,
+            metadatas=vector_chunk_metadas,
+        )
 
         for llm_chunk in llm_chunks_metadata:
             video.llm_chunks.append(
@@ -69,6 +89,10 @@ def db_population_manager(
                     total_duration=llm_chunk["total_duration"],
                 )
             )
+
+        vector_stock_ids = []
+        vector_stock_texts = []
+        vector_stock_metadas = []
 
         for llm_stock in llm_stocks_metadata:
             video.stockSummaries.append(
@@ -88,6 +112,22 @@ def db_population_manager(
                     total_duration=llm_stock["total_duration"],
                 )
             )
+
+            vector_stock_ids.append(f"{video.id}_stock_{llm_stock['stock_name']}")
+            vector_stock_texts.append(llm_stock["stock_full_text"])
+            vector_stock_metadas.append(
+                {
+                    "video_id": str(video.id),
+                    "stock_name": llm_stock["stock_name"],
+                }
+            )
+            # Add to ChromaDB
+            vector_db.add_stock_summary(
+                summary_ids=vector_stock_ids,
+                texts=vector_stock_texts,
+                metadatas=vector_stock_metadas,
+            )
+
         video.summaries.append(
             Summary(
                 # video_id=video.id,
@@ -96,6 +136,18 @@ def db_population_manager(
                 word_count=len(full_report.split()),
             )
         )
+
+        # Add to ChromaDB
+        vector_db.add_video_summary(
+            summary_id=str(video.id),
+            text=full_report,
+            metadata=[
+                {
+                    "video_id": str(video.id),
+                }
+            ],
+        )
+
         session.commit()
 
 
