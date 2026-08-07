@@ -1,11 +1,17 @@
+import os
 from pathlib import Path
 from typing import Dict, Optional
 
-import chromadb
+import chromadb  # pyright: ignore
+from dotenv import load_dotenv
+
+load_dotenv()
+
+chromadb_path = os.getenv("CHROMADB_STORAGE_PATH")
 
 
 class VectorDBManager:
-    def __init__(self, persist_dir: str = "data/chroma_db"):
+    def __init__(self, persist_dir=chromadb_path):
         """
         Initialize ChromaDB client
 
@@ -14,12 +20,12 @@ class VectorDBManager:
         2. Metadata (in SQLite)
         3. Documents (in persistent storage)
         """
-        self.persist_dir = Path(persist_dir)
+        self.persist_dir = Path(persist_dir)  # pyright: ignore
         self.persist_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize persistent client
-        # self.client = chromadb.PersistentClient(path=str(self.persist_dir))
-        self.client = chromadb.PersistentClient(path="../core/data/chroma_db")
+        self.client = chromadb.PersistentClient(path=str(self.persist_dir))
+        # self.client = chromadb.PersistentClient(path="../core/data/chroma_db")
 
         # Get/create collections
         self.original_chunks_collection = self.client.get_or_create_collection(

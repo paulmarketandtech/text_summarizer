@@ -1,31 +1,38 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
-from src.processors import chunker, db_population
+from src.processors import chunker, db_population, managing_files
 from src.storage import database
+from src.utils.create_report_metadata import create_final_report_metadata
 from src.utils.timer import Timer
 
 """
 Workflow:
 user provides yt url 
-download and save transcript plus metadata from api
+download the transcript and pass it plus metadata from api
 chunk it, few more metadata like chunk size, number of them 
 Extracts data from chunks. ollama creates here also some metadata -> json
 aggregate json data and based on that create end report
-save everything to sql DB
-send back to the user the final output and archive it - add logic to move the file
-
-vectorize chunks (still in memory) and save to DB with all metadata for future RAG
+save everything to sql DB and chromaDB
+send back to the user the final output and archive the transcript and final output 
 """
 
-url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
+# already processed
+# url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
+url = "https://youtu.be/QzTrr-pFSJM?si=uqh-uvlYZgUILx4l"
 
 
 def main():
     yt_metadata = youtube_transcript.create_video_transcript(url)
 
-    file_name, sent_chunks = chunker.get_sentence_chunks(4000)
+    sent_chunks = chunker.chunk_by_sentences(
+        raw_transcript=yt_metadata["transcript_text"], max_chunk_size=4000
+    )
 
-    llm_chunks_metadata, llm_stocks_metadata, llm_report_metadata = (  # pyright: ignore
-        transcript_data_extraction.report_generator(file_name, sent_chunks)
+    final_report, llm_chunks_metadata, llm_stocks_metadata = (
+        transcript_data_extraction.process_transcript(sent_chunks)
+    )
+
+    final_report_metadata = create_final_report_metadata(
+        final_report, yt_metadata["transcript_file_name"]
     )
 
     db_population.db_population_manager(
@@ -33,8 +40,10 @@ def main():
         sent_chunks,
         llm_chunks_metadata,
         llm_stocks_metadata,
-        llm_report_metadata,
+        final_report_metadata,
     )
+    # archive files
+    managing_files.file_manager(yt_metadata, final_report_metadata)
 
 
 if __name__ == "__main__":

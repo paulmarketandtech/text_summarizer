@@ -8,7 +8,7 @@ load_dotenv()
 from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 
-def get_video_info(url):
+def get_video_info(url: str) -> dict:
     ydl_opts = {"quiet": True, "no_warnings": True}
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore
@@ -21,7 +21,7 @@ def get_video_info(url):
         }
 
 
-def extract_youtube_id(url):
+def extract_youtube_id(url: str) -> str | None:
     """
     Extracts the YouTube video ID from various YouTube URL formats.
 
@@ -51,7 +51,7 @@ def create_video_transcript(url) -> dict:
 
     video_id = extract_youtube_id(url)
     ytt_api = YouTubeTranscriptApi()
-    yt_meta_data = get_video_info(url)
+    yt_metadata = get_video_info(url)
     fetched_transcript = ytt_api.fetch(video_id, languages=["en", "pl", "de"])
     transcript_text = ""
 
@@ -60,19 +60,15 @@ def create_video_transcript(url) -> dict:
         transcript_text += " "
 
     channel_name_capitalized = "".join(
-        word.capitalize() for word in yt_meta_data["uploader_id"].split()
+        word.capitalize() for word in yt_metadata["uploader_id"].split()
     )
     channel_name_clean = re.sub(r"[^a-zA-Z0-9\\s]", "", channel_name_capitalized)
 
-    filename = f"yt_{yt_meta_data['published_date']}_{channel_name_clean}_{video_id}"
-    transcript_path = f"{os.getenv('FILE_TO_PROCESS_PATH')}/{filename}_transcript.txt"
+    filename = f"yt_{yt_metadata['published_date']}_{channel_name_clean}_{video_id}_transcript.txt"
 
-    yt_meta_data["transcript_path"] = transcript_path
-    yt_meta_data["transcript_text"] = transcript_text
-    yt_meta_data["transcript_char_length"] = len(transcript_text)
-    yt_meta_data["transcript_word_count"] = len(transcript_text.split())
+    yt_metadata["transcript_file_name"] = filename
+    yt_metadata["transcript_text"] = transcript_text
+    yt_metadata["transcript_char_length"] = len(transcript_text)
+    yt_metadata["transcript_word_count"] = len(transcript_text.split())
 
-    with open(transcript_path, "w") as text_file:
-        text_file.write(transcript_text)
-
-    return yt_meta_data
+    return yt_metadata
