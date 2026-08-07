@@ -1,7 +1,7 @@
 from src.extraction import transcript_data_extraction, youtube_transcript
-from src.processors import chunker, db_population
+from src.processors import chunker, db_population, managing_files
 from src.storage import database
-from src.utils.files_operations import create_final_report_metadata
+from src.utils.create_report_metadata import create_final_report_metadata
 from src.utils.timer import Timer
 
 """
@@ -15,14 +15,16 @@ save everything to sql DB and chromaDB
 send back to the user the final output and archive the transcript and final output 
 """
 
-url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
+# already processed
+# url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
+url = "https://youtu.be/QzTrr-pFSJM?si=uqh-uvlYZgUILx4l"
 
 
 def main():
-    raw_transcript, yt_metadata = youtube_transcript.create_video_transcript(url)
+    yt_metadata = youtube_transcript.create_video_transcript(url)
 
     sent_chunks = chunker.chunk_by_sentences(
-        raw_transcript=raw_transcript, max_chunk_size=4000
+        raw_transcript=yt_metadata["transcript_text"], max_chunk_size=4000
     )
 
     final_report, llm_chunks_metadata, llm_stocks_metadata = (
@@ -41,7 +43,7 @@ def main():
         final_report_metadata,
     )
     # archive files
-    # file_manager(transcript_file_name,raw_transcript, output)
+    managing_files.file_manager(yt_metadata, final_report_metadata)
 
 
 if __name__ == "__main__":

@@ -45,13 +45,13 @@ def extract_youtube_id(url: str) -> str | None:
     return None
 
 
-def create_video_transcript(url) -> tuple[str, dict]:
+def create_video_transcript(url) -> dict:
     """Creates transcript of a given YT video and saves it as .txt
     Returns metadata from YT"""
 
     video_id = extract_youtube_id(url)
     ytt_api = YouTubeTranscriptApi()
-    yt_meta_data = get_video_info(url)
+    yt_metadata = get_video_info(url)
     fetched_transcript = ytt_api.fetch(video_id, languages=["en", "pl", "de"])
     transcript_text = ""
 
@@ -60,15 +60,15 @@ def create_video_transcript(url) -> tuple[str, dict]:
         transcript_text += " "
 
     channel_name_capitalized = "".join(
-        word.capitalize() for word in yt_meta_data["uploader_id"].split()
+        word.capitalize() for word in yt_metadata["uploader_id"].split()
     )
     channel_name_clean = re.sub(r"[^a-zA-Z0-9\\s]", "", channel_name_capitalized)
 
-    filename = f"yt_{yt_meta_data['published_date']}_{channel_name_clean}_{video_id}_transcript.txt"
+    filename = f"yt_{yt_metadata['published_date']}_{channel_name_clean}_{video_id}_transcript.txt"
 
-    yt_meta_data["transcript_file_name"] = filename
-    yt_meta_data["transcript_text"] = transcript_text
-    yt_meta_data["transcript_char_length"] = len(transcript_text)
-    yt_meta_data["transcript_word_count"] = len(transcript_text.split())
+    yt_metadata["transcript_file_name"] = filename
+    yt_metadata["transcript_text"] = transcript_text
+    yt_metadata["transcript_char_length"] = len(transcript_text)
+    yt_metadata["transcript_word_count"] = len(transcript_text.split())
 
-    return (transcript_text, yt_meta_data)
+    return yt_metadata

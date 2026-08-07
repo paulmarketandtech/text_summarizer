@@ -1,10 +1,6 @@
 import re
 from typing import Dict, List
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 def clean_transcript(text: str) -> str:
     # 1. Collapse multiple spaces/newlines into a single space

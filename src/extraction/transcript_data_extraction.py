@@ -37,7 +37,6 @@ def extract_facts_from_chunk(chunk: str):
             return data, llm_chunk_metadata
         elif isinstance(data, dict):
             # In case the model returns {"stocks": [...]} instead of direct list
-            print("elif")
             # print(f"chunk: {chunk}")
             print("*" * 40)
             print(data.get("stocks", [data]))

@@ -9,5 +9,7 @@ from src.storage.vector_db import VectorDBManager
 vector_db = VectorDBManager()
 with get_session() as session:
     retriever = DataRetriever(session, vector_db)
-    r = retriever.search_for_chunk("Zeta is a good company", 2)
-    # print(r["relevant_chunks"])
+    r = retriever.search_for_chunk("data dog is a good company", 2)
+    print(r)
+    print("=" * 40)
+    print(r["relevant_chunks"])
