@@ -18,13 +18,17 @@ class Timer:
         print(f"{self.description} took {self.elapsed:.6f} seconds")
 
         # Optional: Re-raise exception if one occurred inside the block
-        if exc_type:
-            return False
-        return True
+        return not exc_type
 
 
 """
 usage:
 wtih Timer():
     ...
+
+    # origina version - can be removed anyway
+    if exc_type:
+        return False
+    return True
+
 """

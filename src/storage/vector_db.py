@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Dict, Optional
 
 import chromadb  # pyright: ignore
 from dotenv import load_dotenv
@@ -96,8 +95,8 @@ class VectorDBManager:
         self,
         query_text: str,
         n_results: int = 5,
-        filter_metadata: Optional[Dict] = None,
-    ) -> Dict:
+        filter_metadata: dict | None = None,
+    ) -> dict:
         """
         Semantic search in transcript chunks
 
@@ -134,8 +133,8 @@ class VectorDBManager:
         self,
         query_text: str,
         n_results: int = 5,
-        filter_metadata: Optional[Dict] = None,
-    ) -> Dict:
+        filter_metadata: dict | None = None,
+    ) -> dict:
         """
         Semantic search in stock summaries
         """
@@ -156,8 +155,8 @@ class VectorDBManager:
         self,
         query_text: str,
         n_results: int = 5,
-        filter_metadata: Optional[Dict] = None,
-    ) -> Dict:
+        filter_metadata: dict | None = None,
+    ) -> dict:
         """
         Semantic search in video summaries
         """
@@ -174,7 +173,7 @@ class VectorDBManager:
             "distances": results["distances"][0],
         }
 
-    def get_chunk(self, chunk_id: str) -> Optional[Dict]:
+    def get_chunk(self, chunk_id: str) -> dict | None:
         """Retrieve a specific chunk"""
         results = self.original_chunks_collection.get(ids=[chunk_id])
         if results["documents"]:
@@ -185,7 +184,7 @@ class VectorDBManager:
             }
         return None
 
-    def get_stock_summary(self, summary_id: str) -> Optional[Dict]:
+    def get_stock_summary(self, summary_id: str) -> dict | None:
         """Retrieve a specific summary"""
         results = self.video_summary_collection.get(ids=[summary_id])
         if results["documents"]:
@@ -196,7 +195,7 @@ class VectorDBManager:
             }
         return None
 
-    def get_video_summary(self, summary_id: str) -> Optional[Dict]:
+    def get_video_summary(self, summary_id: str) -> dict | None:
         """Retrieve a specific summary"""
         results = self.video_summary_collection.get(ids=[summary_id])
         if results["documents"]:
@@ -220,7 +219,7 @@ class VectorDBManager:
         self.stock_summary_collection.delete(ids=[video_id])
         self.video_summary_collection.delete(ids=[video_id])
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """Get stats on what's stored"""
         return {
             "chunk_count": self.original_chunks_collection.count(),

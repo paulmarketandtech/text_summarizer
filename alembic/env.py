@@ -6,7 +6,7 @@ from alembic import context  # isort skip
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from src.storage.models import (
+from src.storage.models import (  # noqa: F401
     Base,
     LLMChunkMetaData,
     SingleStockSummary,
