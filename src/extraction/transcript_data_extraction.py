@@ -116,7 +116,8 @@ def process_transcript(all_chunks: list[dict]):
     all_extractions = []
     llm_chunks_metadata = []
     for idx, chunk in enumerate(all_chunks):
-        print(f"Processing chunk {idx+1}/{len(all_chunks)}...")
+        print(f"Processing chunk {idx + 1}/{len(all_chunks)}...")
+
         facts, llm_chunk_metadata = extract_facts_from_chunk(chunk["text"])
         all_extractions.append(facts)
 
