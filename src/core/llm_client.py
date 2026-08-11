@@ -5,7 +5,7 @@ class OllamaClient:
     def generate(
         self,
         user_prompt: str,
-        system_prompt: str = None,
+        system_prompt: str | None,
         model: str = "qwen2.5:7b",
         temperature: float = 0.2,
         top_p: float = 0.9,

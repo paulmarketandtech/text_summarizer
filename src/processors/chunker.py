@@ -1,5 +1,4 @@
 import re
-from typing import Dict, List
 
 
 def clean_transcript(text: str) -> str:
@@ -85,7 +84,7 @@ def clean_transcript(text: str) -> str:
 
 def chunk_by_sentences(
     raw_transcript: str, max_chunk_size: int = 1000, overlap_sentences: int = 2
-) -> List[Dict]:
+) -> list[dict]:
     """
     Chunk cleaned transcript by sentences with configurable overlap.
     """

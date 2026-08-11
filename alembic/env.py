@@ -6,10 +6,15 @@ from alembic import context  # isort skip
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from src.storage.models import LLMChunkMetaData  # noqa: F401
-from src.storage.models import SingleStockSummary  # noqa: F401
-from src.storage.models import TranscriptChunk  # noqa: F401
-from src.storage.models import Base, Summary, Video, VideoTag  # noqa: F401
+from src.storage.models import (  # noqa: F401
+    Base,
+    LLMChunkMetaData,
+    SingleStockSummary,
+    Summary,
+    TranscriptChunk,
+    Video,
+    VideoTag,
+)
 
 config = context.config
 

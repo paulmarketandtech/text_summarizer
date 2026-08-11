@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-from typing import List, Optional
 
 from sqlalchemy import (
     DateTime,
@@ -26,19 +25,19 @@ class Video(Base):
         String(1000), unique=True, index=True, nullable=False
     )
 
-    title: Mapped[Optional[str]] = mapped_column(String(500))
-    yt_creator: Mapped[Optional[str]] = mapped_column(String(500))
-    published_date: Mapped[Optional[str]] = mapped_column(String(100))
+    title: Mapped[str | None] = mapped_column(String(500))
+    yt_creator: Mapped[str | None] = mapped_column(String(500))
+    published_date: Mapped[str | None] = mapped_column(String(100))
 
-    content_type: Mapped[Optional[str]] = mapped_column(
+    content_type: Mapped[str | None] = mapped_column(
         String(100), index=True
     )  # stock_analysis, drama queen, macro, etc.
-    transcript_file_name: Mapped[Optional[str]] = mapped_column(String(500))
-    summary_file_name: Mapped[Optional[str]] = mapped_column(String(500))
-    summary_preview: Mapped[Optional[str]] = mapped_column(String(500))
+    transcript_file_name: Mapped[str | None] = mapped_column(String(500))
+    summary_file_name: Mapped[str | None] = mapped_column(String(500))
+    summary_preview: Mapped[str | None] = mapped_column(String(500))
 
-    transcript_char_length: Mapped[Optional[int]] = mapped_column()
-    transcript_word_count: Mapped[Optional[int]] = mapped_column()
+    transcript_char_length: Mapped[int | None] = mapped_column()
+    transcript_word_count: Mapped[int | None] = mapped_column()
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
@@ -48,20 +47,20 @@ class Video(Base):
     )
 
     # Relationships
-    chunks: Mapped[List["TranscriptChunk"]] = relationship(
+    chunks: Mapped[list["TranscriptChunk"]] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
         order_by="TranscriptChunk.chunk_index",
     )
-    llm_chunks: Mapped[List["LLMChunkMetaData"]] = relationship(
+    llm_chunks: Mapped[list["LLMChunkMetaData"]] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
     )
-    summaries: Mapped[List["Summary"]] = relationship(
+    summaries: Mapped[list["Summary"]] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
     )
-    stockSummaries: Mapped[List["SingleStockSummary"]] = relationship(
+    stockSummaries: Mapped[list["SingleStockSummary"]] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
     )
@@ -90,12 +89,12 @@ class TranscriptChunk(Base):
     chunk_index: Mapped[int] = mapped_column(nullable=False)
     chunk_text: Mapped[str] = mapped_column(Text, nullable=False)
 
-    char_count: Mapped[Optional[int]] = mapped_column()
-    word_count: Mapped[Optional[int]] = mapped_column()
-    sentence_count: Mapped[Optional[int]] = mapped_column()
+    char_count: Mapped[int | None] = mapped_column()
+    word_count: Mapped[int | None] = mapped_column()
+    sentence_count: Mapped[int | None] = mapped_column()
 
     # Vector DB reference (not stored here),ID in ChromaDB
-    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+    vector_id: Mapped[str | None] = mapped_column(String(100))
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -117,18 +116,18 @@ class LLMChunkMetaData(Base):
     )
 
     chunk_index: Mapped[int] = mapped_column(nullable=False)
-    model_used: Mapped[Optional[str]] = mapped_column(String(100))
-    created_at_llm: Mapped[Optional[int]] = mapped_column()
-    eval_count: Mapped[Optional[int]] = mapped_column()
-    eval_duration: Mapped[Optional[int]] = mapped_column()
-    tokens_per_second: Mapped[Optional[float]] = mapped_column()
-    prompt_eval_count: Mapped[Optional[int]] = mapped_column()
-    prompt_eval_duration: Mapped[Optional[int]] = mapped_column()
-    load_duration: Mapped[Optional[int]] = mapped_column()
-    total_duration: Mapped[Optional[int]] = mapped_column()
+    model_used: Mapped[str | None] = mapped_column(String(100))
+    created_at_llm: Mapped[int | None] = mapped_column()
+    eval_count: Mapped[int | None] = mapped_column()
+    eval_duration: Mapped[int | None] = mapped_column()
+    tokens_per_second: Mapped[float | None] = mapped_column()
+    prompt_eval_count: Mapped[int | None] = mapped_column()
+    prompt_eval_duration: Mapped[int | None] = mapped_column()
+    load_duration: Mapped[int | None] = mapped_column()
+    total_duration: Mapped[int | None] = mapped_column()
 
     # Vector DB reference (not stored here),ID in ChromaDB
-    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+    vector_id: Mapped[str | None] = mapped_column(String(100))
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -150,11 +149,11 @@ class Summary(Base):
     )
 
     final_report: Mapped[str] = mapped_column(Text, nullable=False)
-    char_count: Mapped[Optional[int]] = mapped_column()
-    word_count: Mapped[Optional[int]] = mapped_column()
-    processing_time_seconds: Mapped[Optional[float]] = mapped_column()
+    char_count: Mapped[int | None] = mapped_column()
+    word_count: Mapped[int | None] = mapped_column()
+    processing_time_seconds: Mapped[float | None] = mapped_column()
 
-    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+    vector_id: Mapped[str | None] = mapped_column(String(100))
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -173,24 +172,24 @@ class SingleStockSummary(Base):
     video_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    stock_name: Mapped[Optional[str]] = mapped_column(String(100))
+    stock_name: Mapped[str | None] = mapped_column(String(100))
     stock_full_text: Mapped[str] = mapped_column(Text, nullable=False)
-    char_count: Mapped[Optional[int]] = mapped_column()
-    word_count: Mapped[Optional[int]] = mapped_column()
+    char_count: Mapped[int | None] = mapped_column()
+    word_count: Mapped[int | None] = mapped_column()
 
-    model_used: Mapped[Optional[str]] = mapped_column(String(100))
-    created_at_llm: Mapped[Optional[int]] = mapped_column()
-    eval_count: Mapped[Optional[int]] = mapped_column()
-    eval_duration: Mapped[Optional[int]] = mapped_column()
-    tokens_per_second: Mapped[Optional[float]] = mapped_column()
-    prompt_eval_count: Mapped[Optional[int]] = mapped_column()
-    prompt_eval_duration: Mapped[Optional[int]] = mapped_column()
-    load_duration: Mapped[Optional[int]] = mapped_column()
-    total_duration: Mapped[Optional[int]] = mapped_column()
-    system_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
-    user_prompt_used: Mapped[Optional[str]] = mapped_column(String(100))
+    model_used: Mapped[str | None] = mapped_column(String(100))
+    created_at_llm: Mapped[int | None] = mapped_column()
+    eval_count: Mapped[int | None] = mapped_column()
+    eval_duration: Mapped[int | None] = mapped_column()
+    tokens_per_second: Mapped[float | None] = mapped_column()
+    prompt_eval_count: Mapped[int | None] = mapped_column()
+    prompt_eval_duration: Mapped[int | None] = mapped_column()
+    load_duration: Mapped[int | None] = mapped_column()
+    total_duration: Mapped[int | None] = mapped_column()
+    system_prompt_used: Mapped[str | None] = mapped_column(String(100))
+    user_prompt_used: Mapped[str | None] = mapped_column(String(100))
 
-    vector_id: Mapped[Optional[str]] = mapped_column(String(100))
+    vector_id: Mapped[str | None] = mapped_column(String(100))
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -206,8 +205,8 @@ class VideoTag(Base):
     video_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    tag_type: Mapped[Optional[str]] = mapped_column(String(50))
-    tag_value: Mapped[Optional[str]] = mapped_column(String(200))
+    tag_type: Mapped[str | None] = mapped_column(String(50))
+    tag_value: Mapped[str | None] = mapped_column(String(200))
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

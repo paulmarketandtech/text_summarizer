@@ -1,14 +1,9 @@
 # src/rag/retriever.py
 
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from src.storage.models import (
-    LLMChunkMetaData,
-    SingleStockSummary,
     Summary,
-    TranscriptChunk,
-    Video,
 )
 from src.storage.vector_db import VectorDBManager
 
