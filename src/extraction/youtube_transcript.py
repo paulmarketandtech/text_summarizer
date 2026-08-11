@@ -1,4 +1,3 @@
-import os
 import re
 
 import yt_dlp  # pyright: ignore
