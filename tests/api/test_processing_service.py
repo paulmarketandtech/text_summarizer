@@ -1,6 +1,6 @@
 import pytest
 
-from src.api.processing_service import ProcessingResult, ProcessingService
+from src.api.processing_service import ProcessingService
 
 
 @pytest.fixture
