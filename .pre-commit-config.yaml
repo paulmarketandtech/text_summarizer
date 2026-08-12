@@ -1,0 +1,19 @@
+repos:
+  # Ruff (official mirror – recommended)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.2 # pin to a specific Ruff version (update with `pre-commit autoupdate`)
+    hooks:
+      - id: ruff-check
+        args: [--fix] # auto-fix what it can
+      - id: ruff-format
+
+  # pytest (local hook so it uses your project's environment via uv)
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        types: [python]
+        pass_filenames: false # let pytest discover tests itself
+        # optional: always_run: true   # run even if no Python files changed

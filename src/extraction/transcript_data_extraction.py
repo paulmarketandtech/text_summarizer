@@ -1,6 +1,7 @@
 import json
 import os
 from collections import defaultdict
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -15,8 +16,14 @@ from src.utils.create_report_metadata import (
 )
 
 prompts_file = os.getenv("PROMPTS_FILE_PATH")
+if not prompts_file:
+    raise RuntimeError(
+        "Environment variable PROMPTS_FILE_PATH is not set. "
+        "Please set it to the path of your prompts YAML file."
+    )
 
-with open(prompts_file, "r", encoding="utf-8") as f:
+prompts_path = Path(prompts_file)
+with prompts_path.open("r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
 
 
