@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PROMPTS_FILE_PATH: ./config/prompts.yaml
+      DB_STORAGE_URL: "sqlite:///./data/test.db"
 
     steps:
       - name: Checkout code
