@@ -10,6 +10,8 @@ jobs:
   test-and-lint:
     name: Run Tests and Linter
     runs-on: ubuntu-latest
+    env:
+      PROMPTS_FILE_PATH: ../../config/prompts.yaml
 
     steps:
       - name: Checkout code
