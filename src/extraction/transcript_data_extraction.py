@@ -1,5 +1,10 @@
 import json
+import os
 from collections import defaultdict
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import yaml
 
@@ -9,7 +14,9 @@ from src.utils.create_report_metadata import (
     create_stock_metadata,
 )
 
-with open("../../config/prompts.yaml", "r", encoding="utf-8") as f:
+prompts_file = os.getenv("PROMPTS_FILE_PATH")
+
+with open(prompts_file, "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
 
 
