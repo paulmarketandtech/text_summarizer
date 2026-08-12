@@ -48,10 +48,10 @@ def create_video_transcript(url) -> dict:
     """Creates transcript of a given YT video and saves it as .txt
     Returns metadata from YT"""
 
-    video_id = extract_youtube_id(url)
+    yt_id = extract_youtube_id(url)
     ytt_api = YouTubeTranscriptApi()
     yt_metadata = get_video_info(url)
-    fetched_transcript = ytt_api.fetch(video_id, languages=["en", "pl", "de"])
+    fetched_transcript = ytt_api.fetch(yt_id, languages=["en", "pl", "de"])
     transcript_text = ""
 
     for snippet in fetched_transcript:
@@ -63,9 +63,10 @@ def create_video_transcript(url) -> dict:
     )
     channel_name_clean = re.sub(r"[^a-zA-Z0-9\\s]", "", channel_name_capitalized)
 
-    filename = f"yt_{yt_metadata['published_date']}_{channel_name_clean}_{video_id}_transcript.txt"
+    filename = f"yt_{yt_metadata['published_date']}_{channel_name_clean}_{yt_id}_transcript.txt"
 
     yt_metadata["transcript_file_name"] = filename
+    yt_metadata["yt_id"] = yt_id
     yt_metadata["transcript_text"] = transcript_text
     yt_metadata["transcript_char_length"] = len(transcript_text)
     yt_metadata["transcript_word_count"] = len(transcript_text.split())
