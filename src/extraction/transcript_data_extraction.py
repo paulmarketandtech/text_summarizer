@@ -14,7 +14,7 @@ from src.utils.create_report_metadata import (
     create_stock_metadata,
 )
 
-prompts_file = os.getenv("PROMPTS_FILE_PATH")
+prompts_file = os.environ["PROMPTS_FILE_PATH"]
 
 with open(prompts_file, "r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
