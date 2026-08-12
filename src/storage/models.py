@@ -24,6 +24,7 @@ class Video(Base):
     url: Mapped[str] = mapped_column(
         String(1000), unique=True, index=True, nullable=False
     )
+    yt_id: Mapped[str | None] = mapped_column(String(100))
 
     title: Mapped[str | None] = mapped_column(String(500))
     yt_creator: Mapped[str | None] = mapped_column(String(500))

@@ -29,6 +29,7 @@ def db_population_manager(
             video = Video(
                 id=uuid.uuid4(),
                 url=yt_metadata["url"],
+                yt_id=yt_metadata["yt_id"],
                 title=yt_metadata.get("title"),
                 yt_creator=yt_metadata.get("uploader_id"),
                 published_date=yt_metadata.get("published_date"),
@@ -62,6 +63,7 @@ def db_population_manager(
             vector_chunk_metadas.append(
                 {
                     "video_id": str(video.id),
+                    "yt_id": str(video.yt_id),
                     "chunk_index": chunk["id"],
                 }
             )
@@ -116,6 +118,7 @@ def db_population_manager(
             vector_stock_metadas.append(
                 {
                     "video_id": str(video.id),
+                    "yt_id": str(video.yt_id),
                     "stock_name": llm_stock["stock_name"],
                 }
             )
@@ -142,6 +145,7 @@ def db_population_manager(
             metadata=[
                 {
                     "video_id": str(video.id),
+                    "yt_id": str(video.yt_id),
                 }
             ],
         )
