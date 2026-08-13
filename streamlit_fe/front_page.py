@@ -36,6 +36,7 @@ with st.form("url_input_form"):
     submitted = st.form_submit_button("🚀 Process Video", use_container_width=True)
 
 # ============== PROCESSING LOGIC ==============
+
 if submitted:
     if not yt_url.strip():
         st.error("❌ Please enter a valid YouTube URL")
@@ -70,8 +71,23 @@ if submitted:
             status_text.text(status)
             time.sleep(0.5)  # Small delay for visual effect
 
+        # TODO: reading from file only for testing purposes
+        test_transcript_path = (
+            "../tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
+        )
+        with open(test_transcript_path, "r") as file:
+            dev_transcript_text = file.read()
+
+        yt_metadata = {
+            "transcript_text": dev_transcript_text,
+            "transcript_file_name": "hand-made file name",
+            "title": "hand-made yt title",
+            "published_date": "20260805",
+        }
+        # TODO: yt_metadata will also be made by process
+
         # Actual processing (happens while progress shows)
-        result = service.process_youtube_url(url)
+        result = service.process_youtube_url(yt_metadata)
 
         # Update progress to complete
         progress_bar.progress(1.0)
@@ -103,7 +119,7 @@ if submitted:
                     )
 
                 with col3:
-                    st.metric("Video ID", result.metadata["published_date"])
+                    st.metric("Published date:", result.metadata["published_date"])
 
                 # do wyjebania
                 # Additional metadata

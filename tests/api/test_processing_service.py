@@ -14,7 +14,11 @@ def service_test():
     return TestProcessingService
 
 
-# TEST_TRANSCRIPT="/srv/apps/text_summarizer/tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
+test_transcript_path = (
+    "./tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
+)
+with open(test_transcript_path, "r") as file:
+    test_transcript = file.read()
 # for deplying to GH i have to put pure text in "transcript_text"
 # because gitignore all txt so GH actions don't see transcripts
 yt_metadata = {
