@@ -1,6 +1,3 @@
-import os
-from pathlib import Path
-
 import pytest
 
 from src.api.processing_service import ProcessingService
@@ -16,14 +13,6 @@ def service():
 def service_test():
     return TestProcessingService
 
-
-test_transcript = os.getenv("TEST_TRANSCRIPT")
-if not test_transcript:
-    raise RuntimeError("there's no test transcript. get one!")
-
-transcript_path = Path(test_transcript)
-with transcript_path.open("r", encoding="utf-8") as file:
-    transcript_test = file.read()
 
 # TEST_TRANSCRIPT="/srv/apps/text_summarizer/tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
 # for deplying to GH i have to put pure text in "transcript_text"
