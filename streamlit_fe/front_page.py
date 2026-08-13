@@ -2,7 +2,10 @@ import time
 
 import streamlit as st
 
-from src.api.processing_service import get_processing_service
+# PROD
+# from src.api.processing_service import get_processing_service
+# TEST
+from src.api.testing_processing_service import test_get_processing_service
 
 # Page configuration
 st.set_page_config(
@@ -50,7 +53,7 @@ if submitted:
             status_text = st.empty()
 
         # Get service and process
-        service = get_processing_service()
+        service = test_get_processing_service()
 
         # Simulate progress updates
         status_updates = [
