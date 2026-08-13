@@ -60,7 +60,7 @@ if submitted:
         status_updates = [
             (0, "Extracting transcript..."),
             (0.2, "Chunking content..."),
-            (0.4, "Classifying content..."),
+            (0.4, "Extracting data from chunks"),
             (0.6, "Summarizing transcript..."),
             (0.8, "Saving to database..."),
             (0.95, "Almost done..."),
@@ -69,7 +69,7 @@ if submitted:
         for progress, status in status_updates:
             progress_bar.progress(progress)
             status_text.text(status)
-            time.sleep(0.5)  # Small delay for visual effect
+            time.sleep(5)  # Small delay for visual effect
 
         # TODO: reading from file only for testing purposes
         test_transcript_path = (
