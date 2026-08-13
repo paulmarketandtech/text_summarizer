@@ -1,6 +1,10 @@
 import streamlit as st
 
 
+def sidebar_component():
+    pass
+
+
 def summary_display(summary: str, title: str = "Summary"):
     """Reusable summary display component"""
     st.subheader(f"Summary of video: {title}")
@@ -19,6 +23,7 @@ def metadata_cards(result):
         st.metric("Published date:", result.metadata["published_date"])
 
 
+# Not in use - it's good, but have to do some tweaks here and in the main page to make this work
 def url_input_section() -> str | None:
     """Reusable URL input component"""
     st.header("Process a YouTube Video")
@@ -56,3 +61,9 @@ def action_buttons():
         actions["view"] = st.button("🔍 View in Database")
 
     return actions
+
+
+def in_debug_mode(result):
+    """Reusable errors display component"""
+    st.write(f"Video ID: {result.metadata['title']}")
+    st.write(f"Processing time: {result.processing_time_seconds:.2f}s")

@@ -6,8 +6,12 @@ import streamlit as st
 # from src.api.processing_service import get_processing_service
 # DEV
 from src.api.testing_processing_service import test_get_processing_service
-from streamlit_ui import components
-from streamlit_ui.components import metadata_cards, summary_display, url_input_section
+from streamlit_ui.components import (
+    action_buttons,
+    in_debug_mode,
+    metadata_cards,
+    summary_display,
+)
 
 # Page configuration
 st.set_page_config(
@@ -18,6 +22,7 @@ st.title("📊 Market Intelligence Dashboard")
 st.write("Analyze YouTube financial content and extract insights")
 
 # ============== SIDEBAR CONFIGURATION ==============
+
 with st.sidebar:
     st.header("Settings")
 
@@ -27,9 +32,6 @@ with st.sidebar:
         st.info("Debug mode enabled - more verbose output")
 
 # ============== MAIN INPUT SECTION ==============
-component_url = url_input_section()
-st.header(f"JEBITNE: {component_url}")
-"""
 
 with st.form("url_input_form"):
     yt_url = st.text_input(
@@ -39,13 +41,6 @@ with st.form("url_input_form"):
 
     submitted = st.form_submit_button("🚀 Process Video", use_container_width=True)
 
-if submitted:
-    if not yt_url.strip():
-        st.error("❌ Please enter a valid YouTube URL")
-    else:
-        url = yt_url.strip()
-
-"""
 # ============== PROCESSING LOGIC ==============
 
 if submitted:
@@ -129,30 +124,16 @@ if submitted:
                         st.json(result.metadata)
 
                 # Action buttons
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-                    if st.button("📋 Copy Summary"):
-                        st.toast("Copied to clipboard!")
-
-                with col2:
-                    if st.button("💾 Save as PDF"):
-                        st.info("PDF export coming soon")
-
-                with col3:
-                    if st.button("🔍 View in Database"):
-                        st.info("Database viewer coming soon")
-
+                action_buttons()
         else:
             st.error(f"❌ Processing failed: {result.error}")
 
             if debug_mode:
                 with st.expander("Debug Information"):
-                    st.write(f"Video ID: {result.metadata['title']}")
-                    st.write(f"Processing time: {result.processing_time_seconds:.2f}s")
+                    in_debug_mode(result)
 
 # this displays/remembers the summary after the user changes something on the page
-if "last_result" in st.session_state:
+if "last_result" in st.session_state and not submitted:
     result = st.session_state["last_result"]
     st.subheader(result.metadata["title"])
     st.markdown(result.summary)
