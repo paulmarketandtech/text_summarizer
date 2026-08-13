@@ -20,6 +20,7 @@ class ProcessingResult:
     processing_time_seconds: float
     error: str | None
     metadata: dict | None
+    llm_metadata: list | None
 
 
 class TestProcessingService:
@@ -71,6 +72,11 @@ class TestProcessingService:
                 processing_time_seconds=processing_time,
                 error=None,
                 metadata=yt_metadata,
+                llm_metadata=[
+                    llm_chunks_metadata,
+                    llm_stocks_metadata,
+                    final_report_metadata,
+                ],
             )
 
             logger.info(f"Processing complete in {processing_time:.2f}s")
@@ -88,6 +94,7 @@ class TestProcessingService:
                 processing_time_seconds=processing_time,
                 error=error_msg,
                 metadata=None,
+                llm_metadata=None,
             )
 
 
