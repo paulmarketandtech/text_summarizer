@@ -69,7 +69,7 @@ if submitted:
         for progress, status in status_updates:
             progress_bar.progress(progress)
             status_text.text(status)
-            time.sleep(5)  # Small delay for visual effect
+            time.sleep(0.5)  # Small delay for visual effect
 
         # TODO: reading from file only for testing purposes
         test_transcript_path = (
@@ -106,6 +106,8 @@ if submitted:
                 # Summary
                 st.subheader(f"Summary of video: {yt_metadata['title']}")
                 st.write(result.summary)
+
+                st.session_state["last_result"] = result
 
                 # Metadata
                 col1, col2, col3 = st.columns(3)
@@ -149,6 +151,12 @@ if submitted:
                 with st.expander("Debug Information"):
                     st.write(f"Video ID: {result.metadata['title']}")
                     st.write(f"Processing time: {result.processing_time_seconds:.2f}s")
+
+# this displays/remembers the summary after the user changes something on the page
+if "last_result" in st.session_state:
+    result = st.session_state["last_result"]
+    st.subheader(result.metadata["title"])
+    st.markdown(result.summary)
 
 # ============== RECENT VIDEOS SECTION ==============
 st.divider()
