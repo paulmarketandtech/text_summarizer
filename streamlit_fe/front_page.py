@@ -104,7 +104,7 @@ if submitted:
 
             with result_container:
                 # Summary
-                st.subheader("Summary")
+                st.subheader(f"Summary of video: {yt_metadata['title']}")
                 st.write(result.summary)
 
                 # Metadata
