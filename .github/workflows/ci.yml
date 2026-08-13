@@ -13,6 +13,7 @@ jobs:
     env:
       PROMPTS_FILE_PATH: ./config/prompts.yaml
       DB_STORAGE_URL: "sqlite:///./data/test.db"
+      TEST_TRANSCRIPT: ./tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt
 
     steps:
       - name: Checkout code

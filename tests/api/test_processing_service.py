@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import pytest
 
 from src.api.processing_service import ProcessingService
@@ -14,9 +17,12 @@ def service_test():
     return TestProcessingService
 
 
-with open(
-    "./tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt", "r"
-) as file:
+test_transcript = os.getenv("TEST_TRANSCRIPT")
+if not test_transcript:
+    raise RuntimeError("there's no test transcript. get one!")
+
+transcript_path = Path(test_transcript)
+with transcript_path.open("r") as file:
     transcript_test = file.read()
 
 yt_metadata = {
