@@ -4,8 +4,15 @@ import streamlit as st
 
 # PROD
 # from src.api.processing_service import get_processing_service
-# TEST
+# DEV
 from src.api.testing_processing_service import test_get_processing_service
+from streamlit_ui.components import (
+    action_buttons,
+    in_debug_mode,
+    metadata_cards,
+    sidebar_component,
+    summary_display,
+)
 
 # Page configuration
 st.set_page_config(
@@ -16,16 +23,10 @@ st.title("📊 Market Intelligence Dashboard")
 st.write("Analyze YouTube financial content and extract insights")
 
 # ============== SIDEBAR CONFIGURATION ==============
-with st.sidebar:
-    st.header("Settings")
 
-    debug_mode = st.checkbox("Debug mode", value=False)
-
-    if debug_mode:
-        st.info("Debug mode enabled - more verbose output")
+debug_mode = sidebar_component()
 
 # ============== MAIN INPUT SECTION ==============
-st.header("Process a YouTube Video")
 
 with st.form("url_input_form"):
     yt_url = st.text_input(
@@ -71,7 +72,7 @@ if submitted:
             status_text.text(status)
             time.sleep(0.5)  # Small delay for visual effect
 
-        # TODO: reading from file only for testing purposes
+        # TODO: reading from file only for testing purposes. delete below
         test_transcript_path = (
             "../tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
         )
@@ -84,7 +85,7 @@ if submitted:
             "title": "hand-made yt title",
             "published_date": "20260805",
         }
-        # TODO: yt_metadata will also be made by process
+        # TODO: yt_metadata will also be made by process. delete above
 
         # Actual processing (happens while progress shows)
         result = service.process_youtube_url(yt_metadata)
@@ -104,24 +105,12 @@ if submitted:
 
             with result_container:
                 # Summary
-                st.subheader(f"Summary of video: {yt_metadata['title']}")
-                st.write(result.summary)
+                summary_display(result.summary, yt_metadata["title"])
 
                 st.session_state["last_result"] = result
 
                 # Metadata
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-                    st.metric("Video Title:", result.metadata["title"])
-
-                with col2:
-                    st.metric(
-                        "Processing Time", f"{result.processing_time_seconds:.1f}s"
-                    )
-
-                with col3:
-                    st.metric("Published date:", result.metadata["published_date"])
+                metadata_cards(result)
 
                 # do wyjebania
                 # Additional metadata
@@ -130,30 +119,16 @@ if submitted:
                         st.json(result.metadata)
 
                 # Action buttons
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-                    if st.button("📋 Copy Summary"):
-                        st.toast("Copied to clipboard!")
-
-                with col2:
-                    if st.button("💾 Save as PDF"):
-                        st.info("PDF export coming soon")
-
-                with col3:
-                    if st.button("🔍 View in Database"):
-                        st.info("Database viewer coming soon")
-
+                action_buttons()
         else:
             st.error(f"❌ Processing failed: {result.error}")
 
             if debug_mode:
                 with st.expander("Debug Information"):
-                    st.write(f"Video ID: {result.metadata['title']}")
-                    st.write(f"Processing time: {result.processing_time_seconds:.2f}s")
+                    in_debug_mode(result)
 
 # this displays/remembers the summary after the user changes something on the page
-if "last_result" in st.session_state:
+if "last_result" in st.session_state and not submitted:
     result = st.session_state["last_result"]
     st.subheader(result.metadata["title"])
     st.markdown(result.summary)
