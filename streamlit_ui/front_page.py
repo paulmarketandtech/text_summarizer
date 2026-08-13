@@ -4,8 +4,10 @@ import streamlit as st
 
 # PROD
 # from src.api.processing_service import get_processing_service
-# TEST
+# DEV
 from src.api.testing_processing_service import test_get_processing_service
+from streamlit_ui import components
+from streamlit_ui.components import metadata_cards, summary_display, url_input_section
 
 # Page configuration
 st.set_page_config(
@@ -25,7 +27,9 @@ with st.sidebar:
         st.info("Debug mode enabled - more verbose output")
 
 # ============== MAIN INPUT SECTION ==============
-st.header("Process a YouTube Video")
+component_url = url_input_section()
+st.header(f"JEBITNE: {component_url}")
+"""
 
 with st.form("url_input_form"):
     yt_url = st.text_input(
@@ -35,6 +39,13 @@ with st.form("url_input_form"):
 
     submitted = st.form_submit_button("🚀 Process Video", use_container_width=True)
 
+if submitted:
+    if not yt_url.strip():
+        st.error("❌ Please enter a valid YouTube URL")
+    else:
+        url = yt_url.strip()
+
+"""
 # ============== PROCESSING LOGIC ==============
 
 if submitted:
@@ -71,7 +82,7 @@ if submitted:
             status_text.text(status)
             time.sleep(0.5)  # Small delay for visual effect
 
-        # TODO: reading from file only for testing purposes
+        # TODO: reading from file only for testing purposes. delete below
         test_transcript_path = (
             "../tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
         )
@@ -84,7 +95,7 @@ if submitted:
             "title": "hand-made yt title",
             "published_date": "20260805",
         }
-        # TODO: yt_metadata will also be made by process
+        # TODO: yt_metadata will also be made by process. delete above
 
         # Actual processing (happens while progress shows)
         result = service.process_youtube_url(yt_metadata)
@@ -104,24 +115,12 @@ if submitted:
 
             with result_container:
                 # Summary
-                st.subheader(f"Summary of video: {yt_metadata['title']}")
-                st.write(result.summary)
+                summary_display(result.summary, yt_metadata["title"])
 
                 st.session_state["last_result"] = result
 
                 # Metadata
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-                    st.metric("Video Title:", result.metadata["title"])
-
-                with col2:
-                    st.metric(
-                        "Processing Time", f"{result.processing_time_seconds:.1f}s"
-                    )
-
-                with col3:
-                    st.metric("Published date:", result.metadata["published_date"])
+                metadata_cards(result)
 
                 # do wyjebania
                 # Additional metadata
