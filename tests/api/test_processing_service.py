@@ -22,12 +22,15 @@ if not test_transcript:
     raise RuntimeError("there's no test transcript. get one!")
 
 transcript_path = Path(test_transcript)
-with transcript_path.open("r") as file:
+with transcript_path.open("r", encoding="utf-8") as file:
     transcript_test = file.read()
 
+# TEST_TRANSCRIPT="/srv/apps/text_summarizer/tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
+# for deplying to GH i have to put pure text in "transcript_text"
+# because gitignore all txt so GH actions don't see transcripts
 yt_metadata = {
     "title": "hand-made title",
-    "transcript_text": transcript_test,
+    "transcript_text": "lorem ipsum",
     "uploader_id": "Johny B",
     "published_date": 20260806,
     "url": "fake_url",
