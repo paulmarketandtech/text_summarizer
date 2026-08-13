@@ -2,7 +2,15 @@ import streamlit as st
 
 
 def sidebar_component():
-    pass
+    with st.sidebar:
+        st.header("Settings")
+
+        debug_mode = st.checkbox("Debug mode", value=False)
+
+        if debug_mode:
+            st.info("Debug mode enabled - more verbose output")
+            return True
+    return False
 
 
 def summary_display(summary: str, title: str = "Summary"):

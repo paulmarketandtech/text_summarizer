@@ -10,6 +10,7 @@ from streamlit_ui.components import (
     action_buttons,
     in_debug_mode,
     metadata_cards,
+    sidebar_component,
     summary_display,
 )
 
@@ -23,13 +24,7 @@ st.write("Analyze YouTube financial content and extract insights")
 
 # ============== SIDEBAR CONFIGURATION ==============
 
-with st.sidebar:
-    st.header("Settings")
-
-    debug_mode = st.checkbox("Debug mode", value=False)
-
-    if debug_mode:
-        st.info("Debug mode enabled - more verbose output")
+debug_mode = sidebar_component()
 
 # ============== MAIN INPUT SECTION ==============
 
