@@ -14,18 +14,27 @@ def service_test():
     return TestProcessingService
 
 
-"""
+# TEST_TRANSCRIPT="/srv/apps/text_summarizer/tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
+# for deplying to GH i have to put pure text in "transcript_text"
+# because gitignore all txt so GH actions don't see transcripts
+yt_metadata = {
+    "title": "hand-made title",
+    "transcript_text": "lorem ipsum",
+    "uploader_id": "Johny B",
+    "published_date": 20260806,
+    "url": "fake_url",
+    "transcript_file_name": "made up file name",
+}
+
+
 def test_process_youtube_url(service_test):
-    result = service_test.process_youtube_url(
-        "self str", "https://youtu.be/QzTrr-pFSJM?si=duXj9My7ZVynrrGM"
-    )
+    result = service_test.process_youtube_url("self str", yt_metadata)
 
     assert result.success is True
     assert isinstance(result.summary, str)
     # assert result.processing_time_seconds > 10
     assert result.error is None
     assert isinstance(result.metadata["title"], str)
-"""
 
 
 def test_process_youtube_url_invalid_url(service):

@@ -30,19 +30,22 @@ class TestProcessingService:
         # Initialize any components that need state
         pass
 
-    def process_youtube_url(self, url: str) -> ProcessingResult:
+    def download_youtube_transcript(self, url: str) -> dict:
+
+        logger.info(f"Starting processing for URL: {url}")
+        # ========== STEP 1: Extract transcript ==========
+        logger.debug("Step 1: Extracting YouTube transcript")
+        yt_metadata = youtube_transcript.create_video_transcript(url)
+
+        if not yt_metadata.get("transcript_text"):
+            raise ValueError("Failed to extract transcript")
+
+        return yt_metadata
+
+    def process_youtube_url(self, yt_metadata: dict) -> ProcessingResult:
         start_time = datetime.now(UTC).date()
 
         try:
-            logger.info(f"Starting processing for URL: {url}")
-
-            # ========== STEP 1: Extract transcript ==========
-            logger.debug("Step 1: Extracting YouTube transcript")
-            yt_metadata = youtube_transcript.create_video_transcript(url)
-
-            if not yt_metadata.get("transcript_text"):
-                raise ValueError("Failed to extract transcript")
-
             # ========== STEP 2: Chunk transcript ==========
             logger.debug("Step 2: Chunking transcript")
             sent_chunks = chunker.chunk_by_sentences(
