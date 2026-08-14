@@ -22,10 +22,7 @@ def get_yt_id():
         st.write(ytid[0])
 
 
-from typing import Dict
-
-
-def get_videos_with_summaries() -> Dict[str, str]:
+def get_videos_with_summaries() -> dict[str, str]:
     with get_session() as session:
         stmt = (
             select(Video.title, Summary.final_report)
