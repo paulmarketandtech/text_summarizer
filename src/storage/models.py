@@ -27,7 +27,9 @@ class Video(Base):
 
     title: Mapped[str | None] = mapped_column(String(500))
     yt_creator: Mapped[str | None] = mapped_column(String(500))
-    published_date: Mapped[str | None] = mapped_column(String(100))
+    published_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), index=True
+    )
 
     content_type: Mapped[str | None] = mapped_column(
         String(100), index=True
@@ -56,9 +58,11 @@ class Video(Base):
         back_populates="video",
         cascade="all, delete-orphan",
     )
-    summaries: Mapped[list["Summary"]] = relationship(
+    summary: Mapped["Summary"] = relationship(
         back_populates="video",
         cascade="all, delete-orphan",
+        uselist=False,  # ← This makes it one-to-one
+        foreign_keys="Summary.video_id",
     )
     stockSummaries: Mapped[list["SingleStockSummary"]] = relationship(
         back_populates="video",
@@ -145,7 +149,11 @@ class Summary(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     video_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+        Uuid,
+        ForeignKey("videos.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+        unique=True,  # ← Unique for one-to-one
     )
 
     final_report: Mapped[str] = mapped_column(Text, nullable=False)
@@ -159,7 +167,7 @@ class Summary(Base):
         DateTime(timezone=True), server_default=func.now()
     )
     # Relationship
-    video: Mapped["Video"] = relationship(back_populates="summaries")
+    video: Mapped["Video"] = relationship(back_populates="summary")
 
 
 class SingleStockSummary(Base):
