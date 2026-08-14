@@ -25,7 +25,6 @@ class VideoRecord:
 
 
 class VideoQueryService:
-
     def __init__(self, session: Session):
         self.session = session
 
