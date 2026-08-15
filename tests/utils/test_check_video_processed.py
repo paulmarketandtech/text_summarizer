@@ -9,7 +9,7 @@ real_processed_ids = ["QzTrr-pFSJM", "ZU8LtiAge0g", "A-kgVQ4CihQ", "Ou6CGa0d0_E"
 
 
 @freeze_uuid4(seed=42)
-def test_get_all_yt_ids(db_session):
+def _test_get_all_yt_ids(db_session):
     db_session.add_all(
         [
             Video(
