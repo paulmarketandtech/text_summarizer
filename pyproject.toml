@@ -38,3 +38,6 @@ dev = [
     "pytest-uuid>=1.0.0",
     "ruff>=0.16.2",
 ]
+[tool.ruff.lint]
+# Add DTZ007 to the ignore list
+ignore = ["DTZ007"]
