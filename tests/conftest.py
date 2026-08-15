@@ -2,7 +2,6 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Import your actual models so we can create the tables in the test DB
 from src.storage.models import Base
 
 

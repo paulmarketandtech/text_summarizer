@@ -24,7 +24,6 @@ class VectorDBManager:
 
         # Initialize persistent client
         self.client = chromadb.PersistentClient(path=str(self.persist_dir))
-        # self.client = chromadb.PersistentClient(path="../core/data/chroma_db")
 
         # Get/create collections
         self.original_chunks_collection = self.client.get_or_create_collection(
@@ -82,9 +81,6 @@ class VectorDBManager:
         return summary_ids[0]
 
     def add_video_summary(self, summary_id: str, text: str, metadata: list) -> str:
-        """
-        Add a video summary to vector DB
-        """
         self.video_summary_collection.add(
             ids=[summary_id], documents=[text], metadatas=metadata
         )
@@ -135,9 +131,6 @@ class VectorDBManager:
         n_results: int = 5,
         filter_metadata: dict | None = None,
     ) -> dict:
-        """
-        Semantic search in stock summaries
-        """
         results = self.stock_summary_collection.query(
             query_texts=[query_text],
             n_results=n_results,
@@ -157,9 +150,6 @@ class VectorDBManager:
         n_results: int = 5,
         filter_metadata: dict | None = None,
     ) -> dict:
-        """
-        Semantic search in video summaries
-        """
         results = self.video_summary_collection.query(
             query_texts=[query_text],
             n_results=n_results,
@@ -174,7 +164,6 @@ class VectorDBManager:
         }
 
     def get_chunk(self, chunk_id: str) -> dict | None:
-        """Retrieve a specific chunk"""
         results = self.original_chunks_collection.get(ids=[chunk_id])
         if results["documents"]:
             return {
@@ -185,7 +174,6 @@ class VectorDBManager:
         return None
 
     def get_stock_summary(self, summary_id: str) -> dict | None:
-        """Retrieve a specific summary"""
         results = self.video_summary_collection.get(ids=[summary_id])
         if results["documents"]:
             return {
@@ -196,7 +184,6 @@ class VectorDBManager:
         return None
 
     def get_video_summary(self, summary_id: str) -> dict | None:
-        """Retrieve a specific summary"""
         results = self.video_summary_collection.get(ids=[summary_id])
         if results["documents"]:
             return {
@@ -220,7 +207,6 @@ class VectorDBManager:
         self.video_summary_collection.delete(ids=[video_id])
 
     def get_stats(self) -> dict:
-        """Get stats on what's stored"""
         return {
             "chunk_count": self.original_chunks_collection.count(),
             "stock_count": self.stock_summary_collection.count(),
