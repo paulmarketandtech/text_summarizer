@@ -109,6 +109,13 @@ class VideoQueryService:
 
         return [self._to_record(video) for video in videos]
 
+    def get_video_by_yt_id(self, yt_id: str):
+        return (
+            self.session.query(Video.title, Video.summary)
+            .filter(Video.yt_id == yt_id)
+            .all()
+        )
+
     def search_by_title(self, query: str, limit: int = 50) -> list[VideoRecord]:
         stmt = (
             select(Video)

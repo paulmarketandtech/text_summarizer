@@ -6,6 +6,7 @@ import streamlit as st
 # from src.api.processing_service import get_processing_service
 # DEV
 from src.api.testing_processing_service import test_get_processing_service
+from src.utils.check_video_processed import check_id_in_db, get_processed_summary
 from streamlit_ui.components import (
     action_buttons,
     in_debug_mode,
@@ -14,7 +15,6 @@ from streamlit_ui.components import (
     summary_display,
 )
 
-# Page configuration
 st.set_page_config(
     page_title="Market Intelligence Dashboard", page_icon="📊", layout="wide"
 )
@@ -39,8 +39,13 @@ with st.form("url_input_form"):
 # ============== PROCESSING LOGIC ==============
 
 if submitted:
-    if not yt_url.strip():
-        st.error("❌ Please enter a valid YouTube URL")
+    # check if video was already processed
+    video_processed, new_id = check_id_in_db(yt_url)
+    if video_processed:
+        st.write("Video was already processed. Here you are!")
+        result_container = st.container()
+        processed_title, processed_summary = get_processed_summary(new_id)
+        summary_display(processed_summary, processed_title)
     else:
         url = yt_url.strip()
         # ========== PROCESSING IN PROGRESS ==========

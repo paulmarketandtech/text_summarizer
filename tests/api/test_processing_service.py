@@ -31,6 +31,7 @@ yt_metadata = {
     "published_date": 20260806,
     "url": "fake_url",
     "transcript_file_name": "made up file name",
+    "yt_id": "madeup-id",
 }
 
 
