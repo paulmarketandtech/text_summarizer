@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from sqlalchemy import select
 
 load_dotenv()
 from src.extraction.youtube_transcript import extract_youtube_id
@@ -24,9 +25,11 @@ def check_id_in_db(url: str) -> tuple[bool, str | None]:
 
 def get_processed_summary(yt_id: str) -> tuple[str | None, str]:
     with get_session() as session:
-        video = session.query(Video).filter(Video.yt_id == yt_id).first()
+        # video = session.query(Video).filter(Video.yt_id == yt_id).first()
+        stmt = select(Video).where(Video.yt_id == yt_id)
+        searched_video = session.execute(stmt).scalar()
 
-        return video.title, video.summary.final_report
+        return searched_video.title, searched_video.summary.final_report
 
 
 # print(get_processed_summary("QzTrr-pFSJM"))

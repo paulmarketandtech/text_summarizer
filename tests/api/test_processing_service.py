@@ -2,7 +2,6 @@ import pytest
 
 from src.api.processing_service import ProcessingService
 from src.api.testing_processing_service import TestProcessingService
-from src.storage.models import Video
 
 
 @pytest.fixture
@@ -34,22 +33,6 @@ yt_metadata = {
     "transcript_file_name": "made up file name",
     "yt_id": "madeup-id",
 }
-real_processed_ids = ["QzTrr-pFSJM", "ZU8LtiAge0g", "A-kgVQ4CihQ", "Ou6CGa0d0_E"]
-
-
-def test_video_already_processed(db_session):
-    db_session.add_all(
-        [
-            Video(
-                id="36456234t",
-                url="yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt",
-                yt_id=real_processed_ids[0],
-                title="this is the one",
-            ),
-        ]
-    )
-
-    db_session.commit()
 
 
 def test_process_youtube_url(service_test):

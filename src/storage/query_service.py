@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from sqlalchemy import and_, desc, select
-from sqlalchemy.orm import Session, selectinload, session
+from sqlalchemy.orm import Session, selectinload
 
 from src.storage.models import Summary, Video
 
