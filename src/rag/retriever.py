@@ -1,10 +1,6 @@
-# src/rag/retriever.py
-
 from sqlalchemy.orm import Session
 
-from src.storage.models import (
-    Summary,
-)
+from src.storage.models import Summary
 from src.storage.vector_db import VectorDBManager
 
 
@@ -30,7 +26,6 @@ class DataRetriever:
             filter_metadata={"content_type": content_type},
         )
 
-        # Get full summaries from SQL
         summaries = (
             self.session.query(Summary)
             .filter(Summary.video_id.in_(results["ids"]))

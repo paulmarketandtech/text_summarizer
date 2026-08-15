@@ -4,20 +4,7 @@ from src.storage import database
 from src.utils.create_report_metadata import create_final_report_metadata
 from src.utils.timer import Timer
 
-"""
-Workflow:
-user provides yt url 
-download the transcript and pass it plus metadata from api
-chunk it, few more metadata like chunk size, number of them 
-Extracts data from chunks. ollama creates here also some metadata -> json
-aggregate json data and based on that create end report
-save everything to sql DB and chromaDB
-send back to the user the final output and archive the transcript and final output 
-"""
-
-# already processed
-# url = "https://youtu.be/BgRm41EcU6c?si=E70ipE_PdQwSa6tn"
-url = "https://youtu.be/QzTrr-pFSJM?si=uqh-uvlYZgUILx4l"
+url = ""
 
 
 def main():

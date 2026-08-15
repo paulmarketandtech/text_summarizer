@@ -165,7 +165,6 @@ class Summary(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
-    # Relationship
     video: Mapped["Video"] = relationship(back_populates="summary")
 
 
@@ -201,7 +200,6 @@ class SingleStockSummary(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
-    # Relationship
     video: Mapped["Video"] = relationship(back_populates="stockSummaries")
 
 

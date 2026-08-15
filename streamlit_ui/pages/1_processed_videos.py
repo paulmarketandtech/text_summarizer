@@ -26,7 +26,7 @@ with get_session() as session:
 try:
     # Build query based on filter
     if filter_type == "Recent":
-        videos = query_service.get_videos_basic(limit=limit)
+        videos, total = query_service.get_videos_basic(limit=limit)
 
     elif filter_type == "By Type":
         stats = query_service.get_stats()
@@ -72,7 +72,6 @@ try:
             videos, total = [], None
 
     # ========== DISPLAY ==========
-    total = 8
     if videos:
         if total:
             st.write(f"**{len(videos)} of {total} videos**")

@@ -12,17 +12,6 @@ class OllamaClient:
         top_k: int = 40,
         json_mode: bool = False,
     ) -> str:
-        """
-        Temperature guide:
-        - 0.0: Always same output (deterministic)
-        - 0.2: Very consistent (good for tasks)
-        - 0.5: Balanced
-        - 1.0: Very creative/random
-
-        For summarization: use 0.1-0.3
-        For entity extraction: use 0.1
-        For classification: use 0.1
-        """
 
         import requests
 

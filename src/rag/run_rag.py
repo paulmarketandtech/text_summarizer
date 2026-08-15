@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 
 load_dotenv()
-print("tricky")
 from src.rag.retriever import DataRetriever
 from src.storage.database import get_session
 from src.storage.vector_db import VectorDBManager
