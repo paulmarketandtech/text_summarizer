@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from sqlalchemy import and_, desc, select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, selectinload, session
 
 from src.storage.models import Summary, Video
 
@@ -108,6 +108,13 @@ class VideoQueryService:
         videos = self.session.execute(stmt).scalars().all()
 
         return [self._to_record(video) for video in videos]
+
+    def get_video_by_yt_id(self, yt_id: str):
+        return (
+            self.session.query(Video.title, Video.summary)
+            .filter(Video.yt_id == yt_id)
+            .all()
+        )
 
     def search_by_title(self, query: str, limit: int = 50) -> list[VideoRecord]:
         stmt = (
