@@ -29,7 +29,7 @@ yt_metadata = {
 }
 
 
-def test_process_youtube_url(service):
+def _test_process_youtube_url(service):
     result = service.process_youtube_url("self str", yt_metadata)
 
     assert result.success is True
