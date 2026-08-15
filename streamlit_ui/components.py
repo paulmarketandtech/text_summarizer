@@ -28,7 +28,7 @@ def metadata_cards(result):
     with col2:
         st.metric("Processing Time", f"{result.processing_time_seconds:.1f}s")
     with col3:
-        st.metric("Published date:", result.metadata["published_date"])
+        st.metric("Published date:", str(result.metadata["published_date"]))
 
 
 # Not in use - it's good, but have to do some tweaks here and in the main page to make this work

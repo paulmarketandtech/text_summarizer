@@ -129,14 +129,13 @@ def db_population_manager(
                 metadatas=vector_stock_metadas,
             )
 
-        video.summaries.append(
-            Summary(
-                # video_id=video.id,
-                final_report=final_report_metadata["final_report"],
-                char_count=final_report_metadata["char_count"],
-                word_count=final_report_metadata["word_count"],
-            )
+        new_summary = Summary(
+            final_report=final_report_metadata["final_report"],
+            char_count=final_report_metadata["char_count"],
+            word_count=final_report_metadata["word_count"],
         )
+
+        video.summary = new_summary
 
         # Add to ChromaDB
         vector_db.add_video_summary(

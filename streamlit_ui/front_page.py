@@ -2,10 +2,7 @@ import time
 
 import streamlit as st
 
-# PROD
-# from src.api.processing_service import get_processing_service
-# DEV
-from src.api.testing_processing_service import test_get_processing_service
+from src.api.processing_service import get_processing_service
 from src.utils.check_video_processed import check_id_in_db, get_processed_summary
 from streamlit_ui.components import (
     action_buttons,
@@ -50,7 +47,6 @@ if submitted:
         url = yt_url.strip()
         # ========== PROCESSING IN PROGRESS ==========
 
-        # Show progress placeholder
         progress_container = st.container()
         result_container = st.container()
 
@@ -59,10 +55,8 @@ if submitted:
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-        # Get service and process
-        service = test_get_processing_service()
+        service = get_processing_service()
 
-        # Simulate progress updates
         status_updates = [
             (0, "Extracting transcript..."),
             (0.2, "Chunking content..."),
@@ -77,29 +71,12 @@ if submitted:
             status_text.text(status)
             time.sleep(0.5)  # Small delay for visual effect
 
-        # TODO: reading from file only for testing purposes. delete below
-        test_transcript_path = (
-            "../tests/api/yt_20260806_futurumequities_QzTrr-pFSJM_transcript.txt"
-        )
-        with open(test_transcript_path, "r") as file:
-            dev_transcript_text = file.read()
-
-        yt_metadata = {
-            "transcript_text": dev_transcript_text,
-            "transcript_file_name": "hand-made file name",
-            "title": "hand-made yt title",
-            "published_date": "20260805",
-        }
-        # TODO: yt_metadata will also be made by process. delete above
-
-        # Actual processing (happens while progress shows)
+        yt_metadata = service.download_youtube_transcript(url=url)
         result = service.process_youtube_url(yt_metadata)
 
-        # Update progress to complete
         progress_bar.progress(1.0)
         status_text.text("✅ Processing complete!")
 
-        # Clear progress after processing
         time.sleep(1)
         progress_container.empty()
 
@@ -109,7 +86,6 @@ if submitted:
             st.success("✅ Successfully processed video!")
 
             with result_container:
-                # Summary
                 summary_display(result.summary, yt_metadata["title"])
 
                 st.session_state["last_result"] = result

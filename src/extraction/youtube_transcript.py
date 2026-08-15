@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 import yt_dlp  # pyright: ignore
 from dotenv import load_dotenv
@@ -12,10 +13,14 @@ def get_video_info(url: str) -> dict:
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore
         info = ydl.extract_info(url, download=False)
+
+        upload_date_str = info.get("upload_date")  # YYYYMMDD format
+        parsed_date = datetime.strptime(upload_date_str, "%Y%m%d").date()
+
         return {
             "title": info.get("title"),
             "uploader_id": info.get("uploader_id"),
-            "published_date": info.get("upload_date"),  # YYYYMMDD format
+            "published_date": parsed_date,
             "url": url,
         }
 

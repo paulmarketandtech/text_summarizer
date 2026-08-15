@@ -1,7 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
+    Date,
     DateTime,
     ForeignKey,
     Index,
@@ -27,9 +28,7 @@ class Video(Base):
 
     title: Mapped[str | None] = mapped_column(String(500))
     yt_creator: Mapped[str | None] = mapped_column(String(500))
-    published_date: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), index=True
-    )
+    published_date: Mapped[date | None] = mapped_column(Date, index=True)
 
     content_type: Mapped[str | None] = mapped_column(
         String(100), index=True
