@@ -22,3 +22,4 @@ sometimes there was Applovin but sometimes there was "Apple 11".
 
 Bottom line: If you're looking for an app which will give you all the answers, what to buy and sell then this is not for you.
 If you're looking for an app which quickly tell you what people are talking about and what's the sentiment on the market and you're able to do some searching by yourself then i hope you'll enjoy this app.
+<img width="1326" height="891" alt="image" src="https://github.com/user-attachments/assets/d7d20e8a-4f22-4936-9f6d-e4e95e790c7e" />
