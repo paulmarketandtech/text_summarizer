@@ -3,9 +3,9 @@ from datetime import datetime
 
 import yt_dlp  # pyright: ignore
 from dotenv import load_dotenv
+from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 load_dotenv()
-from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 
 def get_video_info(url: str) -> dict:

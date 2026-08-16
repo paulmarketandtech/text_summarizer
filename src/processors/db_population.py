@@ -152,9 +152,9 @@ def db_population_manager(
         session.commit()
 
 
-def update_full_processing_time(duration: float, url: str) -> None:
+def update_full_processing_time(duration: float, yt_id: str) -> None:
     with get_session() as session:
-        video_id_original = session.query(Video.id).filter(Video.url == url)
+        video_id_original = session.query(Video.id).filter(Video.yt_id == yt_id)
 
         stmt = (
             update(Summary)
