@@ -27,7 +27,7 @@ class ProcessingService:
 
     def download_youtube_transcript(self, url: str) -> dict:
 
-        logger.info(f"Starting processing for URL: {url}")
+        logger.info("Starting processing for URL: %s", url)
         # ========== STEP 1: Extract transcript ==========
         logger.debug("Step 1: Extracting YouTube transcript")
         yt_metadata = youtube_transcript.create_video_transcript(url)

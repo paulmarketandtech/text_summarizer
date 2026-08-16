@@ -1,4 +1,6 @@
+import logging
 import time
+from pathlib import Path
 
 import streamlit as st
 
@@ -11,6 +13,19 @@ from streamlit_ui.components import (
     sidebar_component,
     summary_display,
 )
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    handlers=[
+        logging.FileHandler(
+            Path(__file__).resolve().parents[1] / "archive" / "logs" / "summarizer.log"
+        ),
+        logging.StreamHandler(),  # also print to console
+    ],
+)
+
+logger = logging.getLogger(__name__)
 
 st.set_page_config(
     page_title="Market Intelligence Dashboard", page_icon="📊", layout="wide"
