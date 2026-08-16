@@ -23,8 +23,11 @@ class Timer:
 
 """
 usage:
-wtih Timer():
-    ...
+wtih Timer() as t:
+    func()
+
+execution_time = t.elapsed
+
 
     # origina version - can be removed anyway
     if exc_type:

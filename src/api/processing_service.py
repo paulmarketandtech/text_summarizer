@@ -1,6 +1,6 @@
 import logging
+import time
 from dataclasses import dataclass
-from datetime import UTC, datetime
 
 from src.extraction import transcript_data_extraction, youtube_transcript
 from src.processors import chunker, db_population, managing_files
@@ -38,7 +38,7 @@ class ProcessingService:
         return yt_metadata
 
     def process_youtube_url(self, yt_metadata: dict) -> ProcessingResult:
-        start_time = datetime.now(UTC).date()
+        start_time = time.perf_counter()
 
         try:
             # ========== STEP 2: Chunk transcript ==========
@@ -78,7 +78,12 @@ class ProcessingService:
             logger.info("Files archived")
 
             # ========== SUCCESS ==========
-            processing_time = (datetime.now(UTC).date() - start_time).total_seconds()
+            processing_time = time.perf_counter() - start_time
+
+            # ========== Extra step: save processing_time  ==========
+            db_population.update_full_processing_time(
+                processing_time, yt_metadata["yt_id"]
+            )
 
             result = ProcessingResult(
                 success=True,
@@ -92,7 +97,7 @@ class ProcessingService:
             return result
 
         except Exception as e:
-            processing_time = (datetime.now(UTC).date() - start_time).total_seconds()
+            processing_time = time.perf_counter() - start_time
 
             error_msg = f"Processing failed: {e!s}"
             logger.exception(error_msg)

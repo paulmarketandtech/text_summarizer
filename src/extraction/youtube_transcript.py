@@ -3,13 +3,17 @@ from datetime import datetime
 
 import yt_dlp  # pyright: ignore
 from dotenv import load_dotenv
+from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 load_dotenv()
-from youtube_transcript_api import YouTubeTranscriptApi  # pyright: ignore
 
 
 def get_video_info(url: str) -> dict:
-    ydl_opts = {"quiet": True, "no_warnings": True}
+    ydl_opts = {
+        "quiet": True,
+        "no_warnings": True,
+        "--cookies": "/srv/apps/text_summarizer/src/extraction/www.youtube.com_cookies.txt",
+    }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore
         info = ydl.extract_info(url, download=False)
