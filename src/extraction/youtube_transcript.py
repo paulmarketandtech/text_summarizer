@@ -9,7 +9,11 @@ load_dotenv()
 
 
 def get_video_info(url: str) -> dict:
-    ydl_opts = {"quiet": True, "no_warnings": True}
+    ydl_opts = {
+        "quiet": True,
+        "no_warnings": True,
+        "--cookies": "/srv/apps/text_summarizer/src/extraction/www.youtube.com_cookies.txt",
+    }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore
         info = ydl.extract_info(url, download=False)
