@@ -1,0 +1,40 @@
+services:
+  text-summarizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: text-summarizer
+    ports:
+      - "8503:8503"
+    env_file:
+      - .env
+    environment:
+      - ARCHIVE_DIR=/app/archive
+      - PROMPTS_FILE_PATH=/app/config/prompts.yaml
+    volumes:
+      - ./data:/app/data
+      - ./archive/summaries:/app/archive/summaries
+      - ./archive/transcripts:/app/archive/transcripts
+      - ./archive:/app/archive
+      # Config (read-only)
+      - ./config:/app/config:ro
+      - ./streamlit_ui/:/app/.streamlit_ui:ro
+    restart: unless-stopped
+    networks:
+      - market-net
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import requests; requests.get('http://localhost:8503/_stcore/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  market-net:
+    driver: bridge

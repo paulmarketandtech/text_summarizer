@@ -1,6 +1,6 @@
 class OllamaClient:
-    def __init__(self) -> None:
-        self.host = "http://192.168.0.164:11434"
+    def __init__(self, ollama_host) -> None:
+        self.host = ollama_host
 
     def generate(
         self,

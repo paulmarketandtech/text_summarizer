@@ -5,6 +5,7 @@ from pathlib import Path
 import streamlit as st
 
 from src.api.processing_service import get_processing_service
+from src.storage import database
 from src.utils.check_video_processed import check_id_in_db, get_processed_summary
 from streamlit_ui.components import (
     action_buttons,
@@ -19,13 +20,15 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     handlers=[
         logging.FileHandler(
-            Path(__file__).resolve().parents[1] / "archive" / "logs" / "summarizer.log"
+            Path(__file__).resolve().parents[0] / "archive" / "logs" / "summarizer.log"
         ),
         logging.StreamHandler(),  # also print to console
     ],
 )
 
 logger = logging.getLogger(__name__)
+
+database.init_db()
 
 st.set_page_config(
     page_title="Market Intelligence Dashboard", page_icon="📊", layout="wide"
