@@ -1,8 +1,7 @@
 [project]
 name = "text-summarizer"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "Financial video analysis with LLMs"
 requires-python = ">=3.12"
 dependencies = [
   "alembic>=1.19.0",
@@ -38,6 +37,7 @@ dev = [
     "pytest-uuid>=1.0.0",
     "ruff>=0.16.2",
 ]
+
 [tool.ruff.lint]
 # Add DTZ007 to the ignore list
 ignore = ["DTZ007"]

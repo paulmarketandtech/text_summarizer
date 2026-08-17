@@ -3,11 +3,11 @@ import os
 from collections import defaultdict
 from pathlib import Path
 
+import yaml
 from dotenv import load_dotenv
 
 load_dotenv()
 
-import yaml
 
 from src.core import llm_client
 from src.utils.create_report_metadata import (

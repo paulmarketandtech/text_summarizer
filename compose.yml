@@ -1,0 +1,31 @@
+services:
+  market-intelligence:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: text-summarizer
+    ports:
+      - "8501:8501"
+    environment:
+      - DATABASE_URL=sqlite:////app/data/summarization.db
+      - ARCHIVE_DIR=/app/archive
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+      - ./archive:/app/archive
+      # Config (read-only)
+      - ./config:/app/config:ro
+      - ./streamlit_ui/:/app/.streamlit_ui:ro
+    restart: unless-stopped
+    networks:
+      - market-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8503/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  market-net:
+    driver: bridge
