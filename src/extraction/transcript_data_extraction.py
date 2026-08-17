@@ -27,7 +27,8 @@ with prompts_path.open("r", encoding="utf-8") as f:
     prompts = yaml.safe_load(f)
 
 
-llm = llm_client.OllamaClient()
+ollama_host = os.getenv("OLLAMA_HOST")
+llm = llm_client.OllamaClient(ollama_host)
 
 
 def extract_facts_from_chunk(chunk: str):

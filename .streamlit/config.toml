@@ -1,2 +1,24 @@
+[client]
+showErrorDetails = false
+showWarningOnDirectoryDelete = false
+
+[logger]
+level = "info"
+
 [server]
-port = 8502   
+headless = true
+port = 8503
+address = "0.0.0.0"
+maxUploadSize = 200
+runOnSave = false
+enableXsrfProtection = true
+
+[theme]
+primaryColor = "#1f77b4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[client.toolbarMode]
+developerMode = false

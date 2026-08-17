@@ -19,7 +19,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     handlers=[
         logging.FileHandler(
-            Path(__file__).resolve().parents[1] / "archive" / "logs" / "summarizer.log"
+            Path(__file__).resolve().parents[0] / "archive" / "logs" / "summarizer.log"
         ),
         logging.StreamHandler(),  # also print to console
     ],
