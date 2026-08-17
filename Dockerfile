@@ -28,10 +28,6 @@ RUN mkdir -p /app/archive/transcripts \
     && mkdir -p /app/data
 
 # Expose Streamlit port
-EXPOSE 8501
+EXPOSE 8503
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8501/_stcore/health')"
-
-CMD ["uv", "run", "streamlit", "run", "app.py", "--config", ".streamlit/config.toml"]
+CMD ["uv", "run", "streamlit", "run", "app.py","--server.address", "0.0.0.0", "--server.port", "8503"]
