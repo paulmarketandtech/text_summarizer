@@ -10,7 +10,7 @@ with open(filepath, "r") as file:
 def main():
 
     sent_chunks = lang_chunker.text_chunker(
-        raw_transcript=content, max_chunk_size=8000, chunk_overlap=1000
+        raw_transcript=content, max_chunk_size=6000, chunk_overlap=700
     )
 
     final_report, llm_chunks_metadata, llm_stocks_metadata = (
@@ -18,7 +18,7 @@ def main():
     )
     output_path = "/srv/apps/text_summarizer/src/infrastructure/sandbox/summaries"
     with open(
-        f"{output_path}/20260803_futurumequities_lang_8000_1000_1.md", "w"
+        f"{output_path}/20260803_futurumequities_lang_6000_700_2.md", "w"
     ) as file:
         file.write(final_report)
 

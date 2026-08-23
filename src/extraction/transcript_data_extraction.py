@@ -53,7 +53,8 @@ def extract_facts_from_chunk(chunk: str):
         elif isinstance(data, dict):
             # In case the model returns {"stocks": [...]} instead of direct list
             print("*" * 40)
-            print(data.get("stocks", [data]))
+            __import__("pprint").pprint(data.get("stocks", [data]))
+            # print(data.get("stocks", [data]))
             print("=" * 40)
             return data.get("stocks", [data]), llm_chunk_metadata
     except json.JSONDecodeError:
@@ -68,7 +69,7 @@ def aggregate_extracted_data(
     """Combines extracted JSON pieces into a unified dictionary by Stock Name."""
     grouped_stocks = defaultdict(
         lambda: {
-            "kpis": [],
+            "kpis_mentioned": [],
             "bull_thesis": [],
             "bear_thesis": [],
             "strengths": [],
@@ -84,7 +85,7 @@ def aggregate_extracted_data(
 
             # Append raw extracted facts
             for key in [
-                "kpis",
+                "kpis_mentioned",
                 "bull_thesis",
                 "bear_thesis",
                 "strengths",
@@ -104,7 +105,7 @@ def generate_stock_report(stock_name: str, stock_data: dict) -> dict:
 
     prompt = synthesis_user_template.format(
         stock_name=stock_name,
-        kpis=json.dumps(stock_data["kpis"]),
+        kpis_mentioned=json.dumps(stock_data["kpis_mentioned"]),
         bull_thesis=json.dumps(stock_data["bull_thesis"]),
         bear_thesis=json.dumps(stock_data["bear_thesis"]),
         strengths=json.dumps(stock_data["strengths"]),

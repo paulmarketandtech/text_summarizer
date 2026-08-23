@@ -41,7 +41,7 @@ synthesis_json_data:
     Generate a clean analysis for {stock_name}. Deduplicate facts and present them cleanly.
 
     Raw Notes:
-    - KPIs/Metrics: {kpis}
+    - KPIs/Metrics: {kpis_mentioned}
     - Bull Case: {bull_thesis}
     - Bear Case: {bear_thesis}
     - Strengths: {strengths}
