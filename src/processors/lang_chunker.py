@@ -1,5 +1,7 @@
 import re
 
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 
 def clean_transcript(text: str) -> str:
     # 1. Collapse multiple spaces/newlines into a single space
@@ -82,64 +84,32 @@ def clean_transcript(text: str) -> str:
     return text
 
 
-def chunk_by_sentences(
-    raw_transcript: str, max_chunk_size: int = 1000, overlap_sentences: int = 2
+def text_chunker(
+    raw_transcript: str, max_chunk_size: int = 6000, chunk_overlap: int = 600
 ) -> list[dict]:
-    """
-    Chunk cleaned transcript by sentences with configurable overlap.
-    """
     cleaned_transcript = clean_transcript(raw_transcript)
-
-    sentences = re.split(r"(?<=[.!?])\s+", cleaned_transcript.strip())
-    sentences = [s.strip() for s in sentences if s.strip()]
-
     chunks = []
-    chunk_id = 0
 
-    i = 0
-    while i < len(sentences):
-        current_chunk = []
-        current_length = 0
+    text_splitter = RecursiveCharacterTextSplitter(
+        # Set a really small chunk size, just to show.
+        chunk_size=max_chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
+        is_separator_regex=False,
+    )
+    texts = text_splitter.split_text(cleaned_transcript)
 
-        # Build current chunk
-        j = i
-        while j < len(sentences):
-            sentence = sentences[j]
-            new_length = current_length + len(sentence) + 1  # +1 for space
-
-            if (
-                new_length > max_chunk_size and current_chunk
-            ):  # Don't create empty chunk
-                break
-
-            current_chunk.append(sentence)
-            current_length = new_length
-            j += 1
-
-        # Create chunk
-        chunk_text = " ".join(current_chunk)
-
+    for i, chunk in enumerate(texts):
         chunks.append(
             {
-                "id": chunk_id,
-                "text": chunk_text,
+                "id": i,
+                "text": chunk,
                 "metadata": {
-                    "char_count": len(chunk_text),
-                    "word_count": len(chunk_text.split()),
-                    "sentence_count": len(current_chunk),
-                    "start_sentence_idx": i,
-                    "end_sentence_idx": j - 1,
+                    "char_count": len(chunk),
+                    "word_count": len(chunk.split()),
+                    "sentence_count": len(chunk.split(".")),
                 },
             }
         )
 
-        chunk_id += 1
-
-        # Move forward with overlap
-        if overlap_sentences > 0:
-            i += max(1, len(current_chunk) - overlap_sentences)
-        else:
-            i = j  # No overlap
-
-    # return chunks[:-2]
     return chunks
