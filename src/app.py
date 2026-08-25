@@ -1,3 +1,4 @@
+from src.extraction.transcript_data_extraction import process_transcript
 from src.fetchers import get_transcript_fetcher
 from src.processors.lang_chunker import text_chunker
 
@@ -12,7 +13,11 @@ class TranscriptPipeline:
     def __init__(self):
         self.fetcher = get_transcript_fetcher()
 
-    def process(self, identifier: str) -> list[dict]:
+    def get_raw_transcript(self, identifier: str) -> str:
+        """Just fetch, no chunking (useful for debugging)."""
+        return self.fetcher.fetch(identifier)
+
+    def get_chunks(self, identifier: str) -> list[dict]:
         """
         Full pipeline: fetch and chunk.
 
@@ -30,13 +35,9 @@ class TranscriptPipeline:
 
         return chunks
 
-    def get_raw_transcript(self, identifier: str) -> str:
-        """Just fetch, no chunking (useful for debugging)."""
-        return self.fetcher.fetch(identifier)
+    def extract_data(self, chunks):
+        final_report, llm_chunks_metadata, llm_stocks_metadata = process_transcript(
+            chunks
+        )
 
-
-# Convenience function for quick usage
-def process_transcript(identifier: str) -> list[dict]:
-    """One-liner to process a transcript."""
-    pipeline = TranscriptPipeline()
-    return pipeline.process(identifier)
+        return final_report, llm_chunks_metadata, llm_stocks_metadata

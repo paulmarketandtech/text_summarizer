@@ -6,14 +6,13 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-load_dotenv()
-
-
 from src.core import llm_client
 from src.utils.create_report_metadata import (
     create_response_metadata,
     create_stock_metadata,
 )
+
+load_dotenv()
 
 prompts_file = os.getenv("PROMPTS_FILE_PATH")
 if not prompts_file:

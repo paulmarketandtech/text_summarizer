@@ -8,7 +8,7 @@ load_dotenv(env_file)
 
 
 class Config:
-    MODE = os.getenv("APP_MODE", "production")
+    MODE = os.getenv("APP_MODE", "sandbox")
 
     SANDBOX_DATA_DIR = Path(os.getenv("SANDBOX_DATA_DIR", "./sandbox_data"))
     TRANSCRIPTS_DIR = SANDBOX_DATA_DIR / "transcripts"
