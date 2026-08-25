@@ -23,13 +23,15 @@ class PromptManager:
         category_prompts = self.prompts.get(
             category, self.prompts.get("stock_analysis", {})
         )
-        system_prompt = category_prompts["instruction"]
-        task_prompt = category_prompts["task"]
+        system_prompt = category_prompts["system"]
+        task_prompt = category_prompts["user"]
 
         return {"system": system_prompt, "task": task_prompt}
 
 
-# manager = PromptManager()
+manager = PromptManager("./prompts.yaml")
+prompt = manager.get_prompt("extract_data_to_json")
+print(prompt["task"])
 
 # You can easily swap 'executive_brief' to 'dense_synthesis' to experiment
 # prompt = manager.get_prompt(category="stock_analysis", transcript=chunk_text)

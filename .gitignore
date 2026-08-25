@@ -42,6 +42,7 @@ logs/
 .coverage
 htmlcov/
 scratchpad/
+sandbox_data/
 
 # Notebooks
 .ipynb_checkpoints/
