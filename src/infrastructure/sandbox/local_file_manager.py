@@ -20,5 +20,5 @@ class LocalFileManager:
         ) as file:
             file.write(final_report)
 
-    def print_summary(self) -> None:
+    def print_summary(self, final_report: str) -> None:
         print(final_report)

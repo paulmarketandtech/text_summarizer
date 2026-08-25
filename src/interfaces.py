@@ -1,13 +1,17 @@
-from abc import ABC, abstractmethod
+from typing import Protocol
 
 
-class TranscriptFetcher(ABC):
-    @abstractmethod
-    def fetch(self, video_id: str | None) -> str:
-        pass
+class TranscriptFetcher(Protocol):
+    """Protocol for transcript fetchers. No heavy ABC needed."""
 
+    def fetch(self, identifier: str) -> str:
+        """
+        Fetch transcript and return raw text.
 
-class FileArchiver(ABC):
-    @abstractmethod
-    def save_file(self, transcript: str, summary: str) -> None:
-        pass
+        Args:
+            identifier: YouTube ID (prod) or filename without extension (sandbox)
+
+        Returns:
+            Raw transcript text
+        """
+        ...

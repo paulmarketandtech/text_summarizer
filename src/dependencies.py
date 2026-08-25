@@ -1,12 +1,15 @@
 import os
-from src.interfaces import TranscriptFetcher, FileArchiver
-from src.infrastructure.sandbox import chunking
+
+from src.infrastructure.production.yt_transcript import YouTubeFetcher
+from src.infrastructure.sandbox.local_file_manager import LocalFileManager
+from src.interfaces import TranscriptFetcher
+
+MODE = os.getenv("APP_MODE", "sandbox")
 
 
-MODE = os.getenv("APP_MODE", "development")
-
-
-def get_fetcher() -> TranscriptFetcher:
+def get_transcript() -> TranscriptFetcher:
     if MODE == "sandbox":
-        return LocalFileFetcher(data_path="./sandbox_data/transcripts")
-    return YouTubeFetcher()
+        local_file_manager = LocalFileManager()
+        return local_file_manager.get_transcript_content()
+    youtube_fetcher = YouTubeFetcher()
+    return youtube_fetcher.download_yt_transcript()
