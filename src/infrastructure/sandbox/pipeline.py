@@ -2,9 +2,7 @@ from src.extraction import transcript_data_extraction
 from src.processors import lang_chunker
 from src.utils.timer import Timer
 
-filepath = "./transcripts/yt_20260803_futurumequities_ZGUEFV_vo0U_transcript.txt"
-with open(filepath, "r") as file:
-    content = file.read()
+content = "temp var. but have to provide LocalFileManager class to get transcript"
 
 
 def main():
@@ -16,13 +14,6 @@ def main():
     final_report, llm_chunks_metadata, llm_stocks_metadata = (
         transcript_data_extraction.process_transcript(sent_chunks)
     )
-    output_path = "/srv/apps/text_summarizer/src/infrastructure/sandbox/summaries"
-    with open(
-        f"{output_path}/20260803_futurumequities_lang_6000_700_2.md", "w"
-    ) as file:
-        file.write(final_report)
-
-    # print(final_report)
 
 
 if __name__ == "__main__":
