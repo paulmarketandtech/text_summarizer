@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import chromadb  # pyright: ignore
 from dotenv import load_dotenv
@@ -9,6 +8,7 @@ load_dotenv()
 chromadb_path = os.getenv("CHROMADB_STORAGE_PATH")
 
 
+# TODO: persist_dir not in use anymore
 class VectorDBManager:
     def __init__(self, persist_dir=chromadb_path):
         """

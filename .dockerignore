@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 *.pyo
+*.pyd
 *.egg-info
 .pytest_cache
 .coverage
@@ -22,6 +23,8 @@ build
 # Environment
 .env
 .env.local
+.venv
+.env.*
 
 # Test data (but keep sample data if needed)
 tests/fixtures/large_files
@@ -41,3 +44,20 @@ archive/logs/*
 !archive/transcripts/.gitkeep
 !archive/summaries/.gitkeep
 !archive/logs/.gitkeep
+
+.Python
+*.md
+tests/
+docs/
+.mypy_cache
+.ruff_cache
+.pytest_cache
+.coverage
+htmlcov/
+archive/
+data/
+*.log
+Dockerfile*
+docker-compose*
+.vscode
+.idea
