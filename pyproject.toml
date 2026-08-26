@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
   "alembic>=1.19.0",
   "chromadb>=1.5.9",
+  "langchain-text-splitters>=1.1.2",
   "numpy>=2.5.1",
   "ollama>=0.6.2",
   "python-dotenv>=1.2.2",
@@ -30,6 +31,7 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "marimo>=0.24.0",
     "pre-commit>=4.6.2",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",

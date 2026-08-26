@@ -41,7 +41,7 @@ synthesis_json_data:
     Generate a clean analysis for {stock_name}. Deduplicate facts and present them cleanly.
 
     Raw Notes:
-    - KPIs/Metrics: {kpis}
+    - KPIs/Metrics: {kpis_mentioned}
     - Bull Case: {bull_thesis}
     - Bear Case: {bear_thesis}
     - Strengths: {strengths}
@@ -67,23 +67,3 @@ synthesis_json_data:
 
     **Key Catalysts:**
     - bullet points...
-
-preprocessing:
-  clean_transcript:
-    model: "qwen2.5:7b"
-    options:
-      temperature: 0.1
-    system: >-
-      You are an expert transcription editor. Your job is to convert raw, 
-      spoken audio transcripts into clean, readable text.
-
-      Rules:
-      1. Remove filler words (e.g., "um", "uh", "you know", "yeah").
-      2. Remove stutters and repeated words (e.g., change "i i i really" to "I really").
-      3. Repair broken sentences where a speaker lost their train of thought, but DO NOT invent new facts.
-      4. Preserve the exact vocabulary, industry terminology, and meaning of the speaker.
-      5. Output ONLY the cleaned text. Do not include introductory remarks or explanations.
-    task: |
-      Clean the following raw transcript chunk:
-
-      {raw_text}

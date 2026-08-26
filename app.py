@@ -73,8 +73,6 @@ if submitted:
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-        service = get_processing_service()
-
         status_updates = [
             (0, "Extracting transcript..."),
             (0.2, "Chunking content..."),
@@ -89,8 +87,8 @@ if submitted:
             status_text.text(status)
             time.sleep(0.5)  # Small delay for visual effect
 
-        yt_metadata = service.download_youtube_transcript(url=url)
-        result = service.process_youtube_url(yt_metadata)
+        service = get_processing_service()
+        result = service.process_youtube_url(url=url)
 
         progress_bar.progress(1.0)
         status_text.text("✅ Processing complete!")
@@ -104,7 +102,7 @@ if submitted:
             st.success("✅ Successfully processed video!")
 
             with result_container:
-                summary_display(result.summary, yt_metadata["title"])
+                summary_display(result.summary, result.metadata["title"])
 
                 st.session_state["last_result"] = result
 
