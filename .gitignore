@@ -43,6 +43,7 @@ logs/
 htmlcov/
 scratchpad/
 sandbox_data/
+marimo_files/
 
 # Notebooks
 .ipynb_checkpoints/

@@ -1,6 +1,7 @@
 from typing import Protocol
 
 
+# TODO: to be deleted? whole file
 class TranscriptFetcher(Protocol):
     """Protocol for transcript fetchers. No heavy ABC needed."""
 

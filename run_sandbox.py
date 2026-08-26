@@ -25,28 +25,11 @@ def main():
     pipeline = TranscriptPipeline()
 
     try:
-        chunks = pipeline.get_chunks(identifier)
+        common_pipeline = pipeline.common_part_of_pipeline(identifier)
+        print(type(common_pipeline))
+        print(f"final_report: {common_pipeline.final_report_metadata["summary_preview"]}")
 
-        print(f"✅ Successfully created {len(chunks)} chunks\n")
-
-        if chunks:
-            first = chunks[0]
-            print("📄 Chunk 0:")
-            print(f"   Length: {len(first['text'])}")
-            print(f"   Preview: {first['text'][:100]}...\n")
-
-        # Show stats
-        total_chars = sum(len(c["text"]) for c in chunks)
-        print("📊 Stats:")
-        print(f"   Total chunks: {len(chunks)}")
-        print(f"   Total chars: {total_chars}")
-        print(f"   Avg chunk size: {total_chars // len(chunks)}")
-
-        final_report, llm_chunks_metadata, llm_stocks_metadata = pipeline.extract_data(
-            chunks
-        )
-
-        print(f"final_report: {final_report}")
+        pipeline.populating_db(common_pipeline)
 
     except FileNotFoundError as e:
         print(f"❌ Error: {e}")

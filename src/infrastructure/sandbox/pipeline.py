@@ -1,7 +1,4 @@
 from src.dependencies import get_transcript
-from src.extraction import transcript_data_extraction
-from src.infrastructure.sandbox.local_file_manager import LocalFileManager
-from src.processors import lang_chunker
 from src.utils.timer import Timer
 
 

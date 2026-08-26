@@ -1,8 +1,7 @@
 from src.config import config
-from src.interfaces import TranscriptFetcher
 
 
-def get_transcript_fetcher() -> TranscriptFetcher:
+def get_transcript_fetcher():
     """
     Factory function - returns appropriate fetcher based on APP_MODE.
     """

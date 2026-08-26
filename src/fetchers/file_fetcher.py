@@ -10,7 +10,7 @@ class FileTranscriptFetcher:
         self.base_dir = base_dir or config.TRANSCRIPTS_DIR
         self.base_dir.mkdir(parents=True, exist_ok=True)
 
-    def fetch(self, identifier: str) -> str:
+    def fetch(self, identifier: str) -> dict:
         """
         Read transcript from local file.
 
@@ -32,7 +32,15 @@ class FileTranscriptFetcher:
                 f"Available files: {[f.stem for f in available_files]}"
             )
 
-        return file_path.read_text(encoding="utf-8")
+        transcript_text = file_path.read_text(encoding="utf-8")
+
+        yt_metadata = {}
+        yt_metadata["transcript_file_name"] = identifier
+        yt_metadata["transcript_text"] = transcript_text
+        yt_metadata["transcript_char_length"] = len(transcript_text)
+        yt_metadata["transcript_word_count"] = len(transcript_text.split())
+
+        return yt_metadata
 
     def list_available(self) -> list[str]:
         """List all available transcript files."""
