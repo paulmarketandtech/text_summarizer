@@ -10,7 +10,7 @@ services:
       - .env
     environment:
       - ARCHIVE_DIR=/app/archive
-      - PROMPTS_FILE_PATH=/app/config/prompts.yaml
+      - PROMPTS_FILE_PATH=/app/prompts/prompts.yaml
     volumes:
       - ./data:/app/data
       - ./archive/summaries:/app/archive/summaries

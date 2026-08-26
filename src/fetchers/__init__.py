@@ -5,6 +5,7 @@ def get_transcript_fetcher():
     """
     Factory function - returns appropriate fetcher based on APP_MODE.
     """
+    print("this is init call")
     if config.is_sandbox():
         from src.fetchers.file_fetcher import FileTranscriptFetcher
 

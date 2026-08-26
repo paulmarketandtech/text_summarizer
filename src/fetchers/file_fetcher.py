@@ -6,7 +6,7 @@ from src.config import config
 class FileTranscriptFetcher:
     """Sandbox fetcher - reads transcripts from local files."""
 
-    def __init__(self, base_dir: Path = None):
+    def __init__(self, base_dir: Path | None = None):
         self.base_dir = base_dir or config.TRANSCRIPTS_DIR
         self.base_dir.mkdir(parents=True, exist_ok=True)
 

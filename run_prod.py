@@ -1,14 +1,18 @@
+import logging
 import os
 
 os.environ["ENV_FILE"] = ".env"
 
 from src.app import TranscriptPipeline
 
+logger = logging.getLogger(__name__)
+
 
 def main():
     print("🧪 Prod Mode Test\n")
 
-    identifier = "https://youtu.be/QzTrr-pFSJM"
+    # identifier = "https://youtu.be/QzTrr-pFSJM"
+    identifier = "bad url"
     print(f"🎬 Processing: {identifier}\n")
 
     pipeline = TranscriptPipeline()
@@ -31,14 +35,8 @@ def main():
         print(f"   Total chars: {total_chars}")
         print(f"   Avg chunk size: {total_chars // len(chunks)}")
 
-        final_report, llm_chunks_metadata, llm_stocks_metadata = pipeline.extract_data(
-            chunks
-        )
-
-        print(f"final_report: {final_report}")
-
-    except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+    except Exception:
+        logger.exception("❌ Unexpected error:")
         import traceback
 
         traceback.print_exc()

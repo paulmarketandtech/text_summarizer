@@ -1,9 +1,12 @@
+import logging
 import os
 
 os.environ["ENV_FILE"] = ".env"
 
 from src.app import TranscriptPipeline
 from src.fetchers.file_fetcher import FileTranscriptFetcher
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -26,15 +29,16 @@ def main():
 
     try:
         common_pipeline = pipeline.common_part_of_pipeline(identifier)
-        print(type(common_pipeline))
-        print(f"final_report: {common_pipeline.final_report_metadata["summary_preview"]}")
+        print(
+            f"final_report: {common_pipeline.final_report_metadata['summary_preview']}"
+        )
 
-        pipeline.populating_db(common_pipeline)
+        # pipeline.populating_db(common_pipeline)
 
     except FileNotFoundError as e:
         print(f"❌ Error: {e}")
-    except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+    except Exception:
+        logger.exception("❌ Unexpected error:")
         import traceback
 
         traceback.print_exc()

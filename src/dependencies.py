@@ -7,7 +7,9 @@ from src.interfaces import TranscriptFetcher
 MODE = os.getenv("APP_MODE", "sandbox")
 
 
+# TODO: file to be deleted?
 def get_transcript() -> TranscriptFetcher:
+    print("how often do i get here?")
     if MODE == "sandbox":
         local_file_manager = LocalFileManager()
         return local_file_manager.get_transcript_content()
