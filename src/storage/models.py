@@ -6,6 +6,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    MetaData,
     String,
     Text,
     UniqueConstraint,
@@ -14,7 +15,17 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 
-Base = declarative_base()
+Base = declarative_base(
+    metadata=MetaData(
+        naming_convention={
+            "ix": "ix_%(column_0_label)s",
+            "uq": "uq_%(table_name)s_%(column_0_name)s",
+            "ck": "ck_%(table_name)s_%(constraint_name)s",
+            "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+            "pk": "pk_%(table_name)s",
+        }
+    )
+)
 
 
 class Video(Base):
@@ -24,7 +35,7 @@ class Video(Base):
     url: Mapped[str] = mapped_column(
         String(1000), unique=True, index=True, nullable=False
     )
-    yt_id: Mapped[str | None] = mapped_column(String(100))
+    yt_id: Mapped[str | None] = mapped_column(String(100), unique=True)
 
     title: Mapped[str | None] = mapped_column(String(500))
     yt_creator: Mapped[str | None] = mapped_column(String(500))
@@ -110,24 +121,23 @@ class LLMChunkMetaData(Base):
     __tablename__ = "llm_chunk_metadata"
     __table_args__ = (
         UniqueConstraint("video_id", "chunk_index", name="uq_video_llmchunk_index"),
-        Index("idx_video_llmchunk", "video_id", "chunk_index"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     video_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+        Uuid, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False
     )
 
     chunk_index: Mapped[int] = mapped_column(nullable=False)
     model_used: Mapped[str | None] = mapped_column(String(100))
-    created_at_llm: Mapped[int | None] = mapped_column()
+    created_at_llm: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     eval_count: Mapped[int | None] = mapped_column()
-    eval_duration: Mapped[int | None] = mapped_column()
+    eval_duration: Mapped[float | None] = mapped_column()
     tokens_per_second: Mapped[float | None] = mapped_column()
     prompt_eval_count: Mapped[int | None] = mapped_column()
-    prompt_eval_duration: Mapped[int | None] = mapped_column()
-    load_duration: Mapped[int | None] = mapped_column()
-    total_duration: Mapped[int | None] = mapped_column()
+    prompt_eval_duration: Mapped[float | None] = mapped_column()
+    load_duration: Mapped[float | None] = mapped_column()
+    total_duration: Mapped[float | None] = mapped_column()
 
     # Vector DB reference (not stored here),ID in ChromaDB
     vector_id: Mapped[str | None] = mapped_column(String(100))
@@ -184,14 +194,14 @@ class SingleStockSummary(Base):
     word_count: Mapped[int | None] = mapped_column()
 
     model_used: Mapped[str | None] = mapped_column(String(100))
-    created_at_llm: Mapped[int | None] = mapped_column()
+    created_at_llm: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     eval_count: Mapped[int | None] = mapped_column()
-    eval_duration: Mapped[int | None] = mapped_column()
+    eval_duration: Mapped[float | None] = mapped_column()
     tokens_per_second: Mapped[float | None] = mapped_column()
     prompt_eval_count: Mapped[int | None] = mapped_column()
-    prompt_eval_duration: Mapped[int | None] = mapped_column()
-    load_duration: Mapped[int | None] = mapped_column()
-    total_duration: Mapped[int | None] = mapped_column()
+    prompt_eval_duration: Mapped[float | None] = mapped_column()
+    load_duration: Mapped[float | None] = mapped_column()
+    total_duration: Mapped[float | None] = mapped_column()
     system_prompt_used: Mapped[str | None] = mapped_column(String(100))
     user_prompt_used: Mapped[str | None] = mapped_column(String(100))
 

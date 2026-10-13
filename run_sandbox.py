@@ -30,7 +30,8 @@ def main():
     try:
         common_pipeline = pipeline.common_part_of_pipeline(identifier)
         print(
-            f"final_report: {common_pipeline.final_report_metadata['summary_preview']}"
+            # f"final_report: {common_pipeline.final_report_metadata['summary_preview']}"
+            f"final_report: {common_pipeline.final_report_metadata['final_report']}"
         )
 
         # pipeline.populating_db(common_pipeline)
