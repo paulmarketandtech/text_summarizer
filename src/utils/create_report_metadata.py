@@ -16,20 +16,47 @@ def create_final_report_metadata(final_report: str, transcript_file_name: str) -
     return final_report_metadata
 
 
+import re
+from datetime import datetime
+
+
+def parse_ollama_ts(s: str | None) -> datetime | None:
+    """
+    Helper func to format date
+    From this: 2026-10-12T13:25:54.186469944Z
+    """
+    if not s:
+        return None
+    s = re.sub(r"(\.\d{6})\d+", r"\1", s)  # trim nanoseconds to microseconds
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
 def create_response_metadata(response) -> dict:
+    """
+    By default time is given in nanoseconds.
+    So making them more readable (will be displayed in seconds)
+    and won't have to use in postgres BigIntiger
+    """
     tokens_per_second = response["eval_count"] / (
         response["eval_duration"] / 1_000_000_000
-    )  # nanoseconds
+    )
+    eval_duration = response["eval_duration"] / 1_000_000_000
+
+    prompt_eval_duration = response["prompt_eval_duration"] / 1_000_000_000
+
+    load_duration = response["load_duration"] / 1_000_000_000
+
+    total_duration = response["total_duration"] / 1_000_000_000
     return {
         "model": response["model"],
-        "created_at": response["created_at"],
+        "created_at": parse_ollama_ts(response["created_at"]),
         "eval_count": response["eval_count"],
-        "eval_duration": response["eval_duration"],
+        "eval_duration": round(eval_duration, 2),
         "tokens_per_second": round(tokens_per_second, 2),
         "prompt_eval_count": response["prompt_eval_count"],
-        "prompt_eval_duration": response["prompt_eval_duration"],
-        "load_duration": response["load_duration"],
-        "total_duration": response["total_duration"],
+        "prompt_eval_duration": round(prompt_eval_duration, 2),
+        "load_duration": round(load_duration, 2),
+        "total_duration": round(total_duration, 2),
     }
 
 

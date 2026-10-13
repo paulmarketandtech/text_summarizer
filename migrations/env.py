@@ -1,14 +1,16 @@
+import os
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context  # isort skip
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from src.storage.models import (  # noqa: F401
+from src.storage.models import LLMChunkMetaData  # noqa: F401
+from src.storage.models import (
     Base,
-    LLMChunkMetaData,
     SingleStockSummary,
     Summary,
     TranscriptChunk,
@@ -16,12 +18,16 @@ from src.storage.models import (  # noqa: F401
     VideoTag,
 )
 
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+
 config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+config.set_main_option("sqlalchemy.url", os.environ["MIGRATION_DATABASE_URL"])
 
 # add your model's MetaData object here
 # for 'autogenerate' support

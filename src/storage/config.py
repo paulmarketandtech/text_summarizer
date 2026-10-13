@@ -1,6 +1,6 @@
 import os
 
-DATABASE_URL = os.getenv("DB_STORAGE_URL")
+DATABASE_URL = os.environ["DATABASE_URL"]
 if not DATABASE_URL:
     raise RuntimeError(
         "DB_STORAGE_URL is not set. Add it to your .env file, "
