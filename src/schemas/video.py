@@ -1,6 +1,7 @@
-from datetime import date, datetime
-from pydantic import BaseModel
+from datetime import date
 from uuid import UUID
+
+from pydantic import BaseModel
 
 
 class VideoPublic(BaseModel):

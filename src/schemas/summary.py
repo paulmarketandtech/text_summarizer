@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -17,18 +16,18 @@ class PublicSummaryOut(BaseModel):
 class PublicVideoOut(BaseModel):
     # Video fields the user asked for
     id: UUID
-    title: Optional[str]
+    title: str | None
     url: str
-    yt_creator: Optional[str]
-    published_date: Optional[date]
-    content_type: Optional[str]
-    summary_preview: Optional[str]
+    yt_creator: str | None
+    published_date: date | None
+    content_type: str | None
+    summary_preview: str | None
 
     # Nest the summary so the frontend gets clean JSON
-    summary: Optional[PublicSummaryOut]
+    summary: PublicSummaryOut | None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class TitlesOut(BaseModel):
-    titles: List[str]
+    titles: list[str]

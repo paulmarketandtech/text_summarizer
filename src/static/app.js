@@ -9,10 +9,10 @@ async function toggleSummary(videoId) {
     // Fetch summary content lazily on first open
     if (isOpen && contentDiv.dataset.loaded !== 'true') {
         try {
-            const res = await fetch(`/api/public/videos/${videoId}`);
+            const res = await fetch(`/public/videos/${videoId}`);
             if (!res.ok) throw new Error('Failed to load');
             const data = await res.json();
-            contentDiv.textContent = data.summary || 'No summary available.';
+            contentDiv.textContent = data.summary.final_report || 'No summary available.';
             contentDiv.dataset.loaded = 'true';
         } catch (err) {
             contentDiv.textContent = 'Error loading summary.';
@@ -49,7 +49,7 @@ async function applyFilters() {
     list.innerHTML = '<li class="empty">Loading...</li>';
 
     try {
-        const res = await fetch(`/api/public/videos?${params.toString()}`);
+        const res = await fetch(`/public/videos?${params.toString()}`);
         const videos = await res.json();
         renderVideos(videos);
     } catch (err) {

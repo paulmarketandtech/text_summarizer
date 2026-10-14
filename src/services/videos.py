@@ -2,7 +2,7 @@ from sqlalchemy import distinct, select
 from sqlalchemy.orm import Session, joinedload
 
 from src.schemas.video import FilterOptions, VideoDetailPublic, VideoPublic
-from src.storage.models import Summary, Video
+from src.storage.models import Video
 
 
 class VideoService:

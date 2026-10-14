@@ -10,13 +10,13 @@ from src.schemas.public import (
     VideoPublicItem,
     VideoSearchParams,
 )
-from src.services.videos import VideoService
 from src.storage.database import get_session
 from src.storage.models import Summary, Video
 
 router = APIRouter(prefix="/public", tags=["public"])
 
-
+"""
+DELETE 
 @router.get("/vid")
 def list_videos(
     yt_creator: str | None = None,
@@ -33,6 +33,8 @@ def list_videos(
             date_to=date_to,
             limit=limit,
         )
+
+"""
 
 
 def escape_like(value: str) -> str:
@@ -89,6 +91,17 @@ def search_videos(params: Annotated[VideoSearchParams, Query()]):
 def get_video(video_id: UUID):
     with get_session() as session:
         video = session.get(Video, video_id)
+        if video is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Video not found")
+
+        # Convert inside the session so the lazy-loaded summary is still reachable
+        return VideoPublicDetail.model_validate(video)
+
+
+@router.get("/summary/{video_id}", response_model=VideoPublicDetail)
+def get_summary(video_id: UUID):
+    with get_session() as session:
+        video = session.get(Summary.final_report, video_id)
         if video is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Video not found")
 

@@ -51,3 +51,10 @@ dev = [
 [tool.ruff.lint]
 # Add DTZ007 to the ignore list
 ignore = ["DTZ007"]
+
+[tool.ruff]
+# Exclude a specific file or directory
+extend-exclude = [
+    "vendor/*",
+    "**/migrations/*.py"
+]   

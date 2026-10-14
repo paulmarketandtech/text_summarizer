@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import context
 
 from src.services.videos import VideoService
 from src.storage.database import get_session
