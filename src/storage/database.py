@@ -3,16 +3,36 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .config import DATABASE_URL
+from .config import settings
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine_readonly = create_engine(
+    settings.DATABASE_URL_READONLY,
+    pool_size=10,  # public gets more connections (more traffic)
+    pool_pre_ping=True,  # detect stale connections
+)
 
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+
+SessionReadOnly = sessionmaker(bind=engine_readonly, autoflush=False, autocommit=False)
+SessionApp = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+
+@contextmanager
+def get_session_read_only() -> Session:
+    session = SessionReadOnly()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 @contextmanager
 def get_session() -> Session:
-    session = SessionLocal()
+    session = SessionApp()
     try:
         yield session
         session.commit()

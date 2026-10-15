@@ -1,28 +1,53 @@
+from datetime import date
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import ColumnElement, func, or_, select
+from sqlalchemy.orm import Session
 
+from src.dependencies import get_db_read
 from src.schemas.public import (
     Page,
     VideoPublicDetail,
     VideoPublicItem,
     VideoSearchParams,
 )
+from src.services.videos import VideoService
 from src.storage.database import get_session
 from src.storage.models import Summary, Video
 
 router = APIRouter(prefix="/public", tags=["public"])
 
-"""
-DELETE 
+
+# return db.query(Video).limit(10).all()
+
+
 @router.get("/vid")
 def list_videos(
     yt_creator: str | None = None,
     content_type: str | None = None,
-    date_from: str | None = None,
-    date_to: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    limit: int = 50,
+    db: Session = Depends(get_db_read),
+):
+    return VideoService(db).list_filtered(
+        creator=yt_creator,
+        content_type=content_type,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+    )
+
+
+"""
+@router.get("/vid")
+def list_videos(
+    yt_creator: str | None = None,
+    content_type: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
     limit: int = 50,
 ):
     with get_session() as session:
@@ -33,8 +58,16 @@ def list_videos(
             date_to=date_to,
             limit=limit,
         )
-
 """
+
+
+@router.get("/vid/{video_id}")
+def get_vid(video_id: UUID):
+    with get_session() as session:
+        video = VideoService(session).get_detail(video_id)
+        if not video:
+            raise HTTPException(404, "Video not found")
+        return video
 
 
 def escape_like(value: str) -> str:
