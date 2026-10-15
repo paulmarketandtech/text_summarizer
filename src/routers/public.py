@@ -2,9 +2,11 @@ from datetime import date
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import ColumnElement, func, or_, select
+from sqlalchemy.orm import Session
 
+from src.dependencies import get_db_read
 from src.schemas.public import (
     Page,
     VideoPublicDetail,
@@ -18,6 +20,28 @@ from src.storage.models import Summary, Video
 router = APIRouter(prefix="/public", tags=["public"])
 
 
+# return db.query(Video).limit(10).all()
+
+
+@router.get("/vid")
+def list_videos(
+    yt_creator: str | None = None,
+    content_type: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    limit: int = 50,
+    db: Session = Depends(get_db_read),
+):
+    return VideoService(db).list_filtered(
+        creator=yt_creator,
+        content_type=content_type,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+    )
+
+
+"""
 @router.get("/vid")
 def list_videos(
     yt_creator: str | None = None,
@@ -34,6 +58,7 @@ def list_videos(
             date_to=date_to,
             limit=limit,
         )
+"""
 
 
 @router.get("/vid/{video_id}")
