@@ -41,26 +41,6 @@ def list_videos(
     )
 
 
-"""
-@router.get("/vid")
-def list_videos(
-    yt_creator: str | None = None,
-    content_type: str | None = None,
-    date_from: date | None = None,
-    date_to: date | None = None,
-    limit: int = 50,
-):
-    with get_session() as session:
-        return VideoService(session).list_filtered(
-            creator=yt_creator,
-            content_type=content_type,
-            date_from=date_from,
-            date_to=date_to,
-            limit=limit,
-        )
-"""
-
-
 @router.get("/vid/{video_id}")
 def get_vid(video_id: UUID):
     with get_session() as session:

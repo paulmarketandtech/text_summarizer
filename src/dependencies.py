@@ -18,21 +18,6 @@ def get_transcript() -> TranscriptFetcher:
     return youtube_fetcher.download_yt_transcript()
 """
 
-from fastapi import APIRouter, Depends
-
-router = APIRouter()
-
-
-def my_dependency():
-    return "hello"
-
-
-@router.get("/test")
-def my_route(value: str = Depends(my_dependency)):
-    # value is "hello" — FastAPI called my_dependency() for you
-    return {"value": value}
-
-
 from typing import Generator
 
 from fastapi import HTTPException, Request
